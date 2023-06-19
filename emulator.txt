@@ -1,0 +1,65 @@
+export GOOGLE_APPLICATION_CREDENTIALS="key.json"
+
+
+import {setTimeout} from "timers/promises";
+await setTimeout(5000);
+
+
+currency.getCurrencyRate({ currency: 'EUR' })
+
+
+
+https://cloud.google.com/datastore/docs/configure-indexes-rest-api => Start Cloud Shell => gcloud auth print-access-token
+
+SELECT * FROM rates WHERE __key__ HAS ANCESTOR KEY(currency, 'UAH') ORDER BY date DESC
+
+POST => https://datastore.googleapis.com/v1/projects/manetta-2023/indexes
+
+{
+  "kind": "rate",
+  "ancestor": "ALL_ANCESTORS",
+  "properties": [
+      {
+          "name": "date",
+          "direction": "DESCENDING"
+      }
+  ]
+}
+
+
+SELECT * FROM posted WHERE currency = KEY(currency, 'UAH') ORDER BY date DESC
+
+{
+  "kind": "posted",
+  "ancestor": "none",
+  "properties": [
+      {
+          "name": "currency",
+          "direction": "ASCENDING"
+      },
+      {
+          "name": "date",
+          "direction": "DESCENDING"
+      }
+  ]
+}
+SELECT * FROM posted WHERE account = KEY(account, 'PRIVAT-EUR') ORDER BY created DESC
+{
+  "kind": "posted",
+  "ancestor": "none",
+  "properties": [
+      {
+          "name": "account",
+          "direction": "ASCENDING"
+      },
+      {
+          "name": "created",
+          "direction": "DESCENDING"
+      }
+  ]
+}
+
+SELECT * FROM rates WHERE __key__ HAS ANCESTOR KEY(currency, 'UAH') AND date < DATETIME('2023-02-23T00:00:00z') ORDER BY date DESC
+
+
+firebase deploy --only functions:operation-getAllOperation
