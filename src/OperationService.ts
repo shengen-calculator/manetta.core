@@ -150,10 +150,10 @@ export default class OperationStoreService {
             const hashCode = Util.hashCode(operation.tags.toString());
             const combination =
                 await this.dataStoreService.getEntityById("tag", hashCode);
-            if(!combination) {
+            if (!combination) {
                 await this.dataStoreService.insertEntity(
                     "tag", hashCode, {
-                        tags: operation.tags
+                        tags: operation.tags,
                     });
             }
         } catch (err: any) {
