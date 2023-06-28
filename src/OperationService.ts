@@ -145,14 +145,16 @@ export default class OperationStoreService {
      * Update tags combination
      * @param {Operation} operation
      */
-    public updateTags = async (operation: Operation) => {
+    public updateTags = async (operation: Operation): Promise<void> => {
         try {
             const hashCode = Util.hashCode(operation.tags.toString());
             const combination =
-                this.dataStoreService.getEntityByName("tag", hashCode.toString());
+                await this.dataStoreService.getEntityById("tag", hashCode);
             if(!combination) {
-                return await this.dataStoreService.insertEntity(
-                    "tag", hashCode.toString(), operation.tags);
+                await this.dataStoreService.insertEntity(
+                    "tag", hashCode, {
+                        tags: operation.tags
+                    });
             }
         } catch (err: any) {
             if (this.transaction) {

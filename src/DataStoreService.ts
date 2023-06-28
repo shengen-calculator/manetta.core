@@ -35,6 +35,19 @@ export default class DataStoreService {
     }
 
     /**
+     * Get entity by id
+     * @param {Entity} entity
+     * @param {number} id = key
+     */
+    public async getEntityById(entity: Entity, id: number) {
+        const key = this.datastore.key([entity, id]);
+        const [item] = this.transaction ?
+            await this.transaction.get(key) :
+            await this.datastore.get(key);
+        return item;
+    }
+
+    /**
      * Return only one single entity selected by equality filter
      * @param {Entity} entity
      * @param {string} filteredField
@@ -274,10 +287,10 @@ export default class DataStoreService {
     /**
      * Insert new Entity, key must be provided
      * @param {Entity} entity
-     * @param {string} key
+     * @param {number} key
      * @param {object} data
      */
-    public async insertEntity(entity: Entity, key: string, data: any) {
+    public async insertEntity(entity: Entity, key: number, data: any) {
         const entityKey = this.datastore.key([entity, key]);
         return this.transaction ?
             await this.transaction.insert({
