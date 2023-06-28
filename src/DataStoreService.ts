@@ -279,10 +279,15 @@ export default class DataStoreService {
      */
     public async insertEntity(entity: Entity, key: string, data: any) {
         const entityKey = this.datastore.key([entity, key]);
-        return await this.datastore.insert({
-            key: entityKey,
-            data: data,
-        });
+        return this.transaction ?
+            await this.transaction.insert({
+                key: entityKey,
+                data: data,
+            }) :
+            await this.datastore.insert({
+                key: entityKey,
+                data: data,
+            });
     }
 
     /**

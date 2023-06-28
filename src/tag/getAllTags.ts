@@ -6,8 +6,7 @@ export const getAllTags = async (data: any, context: any) => {
     try {
         const datastore = new Datastore();
         const dataStoreService = new DataStoreService(datastore);
-        const tags = await dataStoreService.getAll("tag", false);
-        return tags.map((data) => data.tags);
+        return await dataStoreService.getAll("tag", false);
     } catch (error: any) {
         const runQueryError: RunQueryError = error;
         throw new functions.https.HttpsError("internal",
