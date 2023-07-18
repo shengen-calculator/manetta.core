@@ -75,7 +75,7 @@ type RunQueryError = {
 }
 
 type SaveGroupInput = {
-    groupName: string,
+    name: string,
     tags: string[]
 }
 

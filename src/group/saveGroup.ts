@@ -6,7 +6,7 @@ export const saveGroup = async (data: SaveGroupInput, context: any) => {
     try {
         const datastore = new Datastore();
         const dataStoreService = new DataStoreService(datastore);
-        return await dataStoreService.upsertEntity("group", data.groupName, {
+        return await dataStoreService.upsertEntity("group", data.name, {
             tags: data.tags,
         });
     } catch (error: any) {
