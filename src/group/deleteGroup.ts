@@ -6,7 +6,7 @@ export const deleteGroup = async (data: DeleteGroupInput, context: any) => {
     try {
         const datastore = new Datastore();
         const dataStoreService = new DataStoreService(datastore);
-        return await dataStoreService.deleteEnity("group", data.groupName);
+        return await dataStoreService.deleteEnity("group", data.name);
     } catch (error: any) {
         const runQueryError: RunQueryError = error;
         throw new functions.https.HttpsError("internal",

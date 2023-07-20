@@ -61,14 +61,6 @@ type User = {
     role: ROLE
 }
 
-type CreateTagInput = {
-    tag: string
-}
-
-type DeleteTagInput = {
-    tag: string
-}
-
 type RunQueryError = {
     code: number,
     details: string
@@ -80,7 +72,7 @@ type SaveGroupInput = {
 }
 
 type DeleteGroupInput = {
-    groupName: string
+    name: string
 }
 
 type GetCurrencyRateInput = {
