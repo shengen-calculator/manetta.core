@@ -147,6 +147,32 @@ export default class DataStoreService {
     }
 
     /**
+     * Get latest range of entities from the collection (sorted by date)
+     * @param {Entity} entity
+     * @param {string} orderField
+     * @param {string} startCursor
+     */
+    public async getNewestItems(entity: Entity, orderField: string, startCursor: string) {
+        const storeQuery = this.transaction ?
+            this.transaction.createQuery(entity) :
+            this.datastore.createQuery(entity);
+        storeQuery.order(orderField, {
+            descending: true,
+        });
+        storeQuery.limit(20);
+        storeQuery.start(startCursor);
+        const queryResult: RunQueryResponse = this.transaction ?
+            await this.transaction.runQuery(storeQuery) :
+            await this.datastore.runQuery(storeQuery);
+
+        const [entities, info] = queryResult;
+        return {
+            entities,
+            info
+        }
+    }
+
+    /**
      * Get one latest entity, selected by ancestor
      * @param {Entity} entity
      * @param {Entity} ancestor
