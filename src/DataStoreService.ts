@@ -152,7 +152,8 @@ export default class DataStoreService {
      * @param {string} orderField
      * @param {string} startCursor
      */
-    public async getNewestItems(entity: Entity, orderField: string, startCursor: string) {
+    public async getNewestItems(entity: Entity,
+                                orderField: string, startCursor: string) {
         const storeQuery = this.transaction ?
             this.transaction.createQuery(entity) :
             this.datastore.createQuery(entity);
@@ -168,8 +169,8 @@ export default class DataStoreService {
         const [entities, info] = queryResult;
         return {
             entities,
-            info
-        }
+            info,
+        };
     }
 
     /**

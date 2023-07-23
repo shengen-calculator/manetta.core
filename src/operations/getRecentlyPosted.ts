@@ -24,8 +24,8 @@ export const getRecentlyPosted = async (data: any, context: any) => {
         });
         return {
             entries,
-            cursor: result.info.endCursor
-        }
+            cursor: result.info.endCursor,
+        };
     } catch (error: any) {
         const runQueryError: RunQueryError = error;
         throw new functions.https.HttpsError("internal",
