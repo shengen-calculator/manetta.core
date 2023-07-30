@@ -68,13 +68,19 @@ export default class DataStoreService {
      * @param {Entity} entity
      * @param {string} filteredField
      * @param {string} value
+     * @param {string} orderField
      */
-    public async getFilteredEntities(entity: Entity,
-                                     filteredField: string, value: string) {
+    public async getFilteredEntities(
+        entity: Entity,
+        filteredField: string, value: string,
+        orderField: string | undefined = undefined) {
         const storeQuery = this.transaction ?
             this.transaction.createQuery(entity) :
             this.datastore.createQuery(entity);
         storeQuery.filter(filteredField, "=", value);
+        if (orderField) {
+            storeQuery.order(orderField);
+        }
         const [items] = this.transaction ?
             await this.transaction.runQuery(storeQuery) :
             await this.datastore.runQuery(storeQuery);
