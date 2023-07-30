@@ -61,5 +61,21 @@ SELECT * FROM posted WHERE account = KEY(account, 'PRIVAT-EUR') ORDER BY created
 
 SELECT * FROM rates WHERE __key__ HAS ANCESTOR KEY(currency, 'UAH') AND date < DATETIME('2023-02-23T00:00:00z') ORDER BY date DESC
 
+{
+  "kind": "operation",
+  "ancestor": "none",
+  "properties": [
+      {
+          "name": "user",
+          "direction": "ASCENDING"
+      },
+      {
+          "name": "created",
+          "direction": "ASCENDING"
+      }
+  ]
+}
+
+SELECT * FROM operation WHERE user = "fake.user@test.com" ORDER BY created
 
 firebase deploy --only functions:operation-getAllOperation
