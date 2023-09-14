@@ -5,11 +5,13 @@ import {getAllOperation} from "./operations/getAllOperations";
 import {getPostedOperation} from "./operations/getPostedOperations";
 import {postOperations} from "./operations/postOperations";
 import {getRecentlyPosted} from "./operations/getRecentlyPosted";
+import {operationReport} from "./operations/operationReport";
 
 exports.postOperations = authDecorator(postOperations, ["ADMIN", "BOOKER"]);
 exports.saveOperation = authDecorator(saveOperation, ["ADMIN", "BOOKER"]);
 exports.deleteOperation = authDecorator(deleteOperation, ["ADMIN"]);
 exports.getAllOperation = authDecorator(getAllOperation, ["ADMIN", "BOOKER"]);
+exports.operationReport = authDecorator(operationReport, ["ADMIN"]);
 exports.getRecentlyPosted =
     authDecorator(getRecentlyPosted, ["ADMIN", "BOOKER"]);
 exports.getPostedOperation =
