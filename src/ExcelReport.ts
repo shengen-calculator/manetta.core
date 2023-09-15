@@ -8,15 +8,18 @@ const xl = require("excel4node");
 export default class ExcelReport {
     private readonly wb: any;
     private readonly ws: any;
-    //private readonly data: any;
+    private readonly data: Array<OperationBase>;
 
-    constructor(data: any) {
+    constructor(data: Array<OperationBase>) {
         this.wb = new xl.Workbook();
-        this.ws = this.wb.addWorksheet("Operation report");
-        //this.data = data;
+        this.ws = this.wb.addWorksheet("Manetta report");
+        this.data = data;
     }
 
     public saveToFile = (fileName: string): string => {
+        if(!this.data.length) {
+            throw new Error("There is no data for report")
+        }
         const style = this.wb.createStyle({
             font: {
                 color: '#FF0800',

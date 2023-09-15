@@ -1,6 +1,7 @@
 import DataStoreService from "../DataStoreService";
 import * as functions from "firebase-functions";
 import {Datastore} from "@google-cloud/datastore";
+import ExcelReport from "../ExcelReport";
 
 export const operationReport = async (data: any, context: any) => {
     try {
@@ -10,10 +11,9 @@ export const operationReport = async (data: any, context: any) => {
         const endDate = data.endDate ? new Date(data.endDate) : undefined;
         const operations = await dataStoreService
             .getAll("posted", false, startDate, endDate);
-        return operations.map((entity) => {
-            const key = entity[datastore.KEY];
+        const reportData: Array<OperationBase> = operations.map((entity) => {
             return {
-                id: key.id,
+                id: undefined,
                 account: entity.account.name,
                 date: entity.date.getTime(),
                 description: entity.description,
@@ -21,6 +21,9 @@ export const operationReport = async (data: any, context: any) => {
                 tags: entity.tags,
             };
         });
+        const excelReport = new ExcelReport(reportData);
+        return excelReport.saveToFile("new-report.xlsx");
+
     } catch (error: any) {
         const runQueryError: RunQueryError = error;
         throw new functions.https.HttpsError("internal",
