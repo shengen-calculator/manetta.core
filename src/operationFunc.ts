@@ -11,7 +11,7 @@ exports.postOperations = authDecorator(postOperations, ["ADMIN", "BOOKER"]);
 exports.saveOperation = authDecorator(saveOperation, ["ADMIN", "BOOKER"]);
 exports.deleteOperation = authDecorator(deleteOperation, ["ADMIN"]);
 exports.getAllOperation = authDecorator(getAllOperation, ["ADMIN", "BOOKER"]);
-exports.operationReport = authDecorator(operationReport, ["ADMIN"]);
+exports.operationReport = authDecorator(operationReport, ["ADMIN", "BOOKER"]);
 exports.getRecentlyPosted =
     authDecorator(getRecentlyPosted, ["ADMIN", "BOOKER"]);
 exports.getPostedOperation =

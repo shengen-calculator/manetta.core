@@ -8,6 +8,7 @@ await setTimeout(5000);
 currency.getCurrencyRate({ currency: 'EUR' })
 
 operation.getPostedOperation({ startDate: "2023-09-10", endDate: "2023-09-12"})
+operation.operationReport({ startDate: "2023-09-10", endDate: "2023-09-12"})
 
 https://cloud.google.com/datastore/docs/configure-indexes-rest-api => Start Cloud Shell => gcloud auth print-access-token
 

@@ -22,8 +22,9 @@ export const operationReport = async (data: any, context: any) => {
             };
         });
         const excelReport = new ExcelReport(reportData);
-        return excelReport.saveToFile("new-report.xlsx");
-
+        const fileName = "new-report.xlsx";
+        const path = excelReport.saveToFile(fileName);
+        return await excelReport.uploadFileToBucket(path, fileName);
     } catch (error: any) {
         const runQueryError: RunQueryError = error;
         throw new functions.https.HttpsError("internal",
