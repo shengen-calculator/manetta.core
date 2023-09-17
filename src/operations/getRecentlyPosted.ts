@@ -6,6 +6,13 @@ export const getRecentlyPosted = async (data: any, context: any) => {
     try {
         const datastore = new Datastore();
         const dataStoreService = new DataStoreService(datastore);
+        const blockedMap = new Map();
+        const accounts = await dataStoreService.getAll("account", false);
+        accounts.forEach((entity) => {
+            const key = entity[datastore.KEY];
+            blockedMap.set(key.name, entity.blocked);
+        });
+
         const result = await dataStoreService
             .getNewestItems("posted", "created", data.startCursor);
         const entries = result.entities.map((entity) => {
@@ -17,7 +24,7 @@ export const getRecentlyPosted = async (data: any, context: any) => {
                 description: entity.description,
                 docNumber: entity.docNumber,
                 euro: entity.equivalent,
-                balance: entity.balance,
+                balance: entity.balance - blockedMap.get(entity.account.name),
                 sum: entity.sum,
                 tags: entity.tags,
             };
