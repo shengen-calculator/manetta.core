@@ -1,5 +1,4 @@
 /* eslint @typescript-eslint/no-var-requires: "off" */
-import {GetSignedUrlConfig} from "@google-cloud/storage";
 import * as admin from "firebase-admin";
 import * as path from "path";
 import * as os from "os";
@@ -13,7 +12,9 @@ const xl = require("excel4node");
 export default class ExcelReport {
     private readonly wb: any;
     private readonly ws: any;
-    private readonly style: any;
+    private readonly numberStyle: any;
+    private readonly dateStyle: any;
+    private rowNumber = 1;
     private readonly data: Array<OperationBase>;
 
     /**
@@ -21,17 +22,21 @@ export default class ExcelReport {
      * @param {Array<OperationBase>} data for report
      */
     constructor(data: Array<OperationBase>) {
-        this.wb = new xl.Workbook();
+        this.wb = new xl.Workbook({
+            dateFormat: "d-m-yy",
+        });
         this.ws = this.wb.addWorksheet("Manetta report");
         this.data = data;
-        this.style = this.createStyles();
+        this.dateStyle = this.createDateStyles();
+        this.numberStyle = this.createNumberStyles();
+        this.ws.column(1).setWidth(50);
     }
 
     /**
      * Create styles
      * @return {any}
      */
-    private createStyles = () => {
+    private createNumberStyles = () => {
         return this.wb.createStyle({
             font: {
                 color: "#FF0800",
@@ -42,33 +47,62 @@ export default class ExcelReport {
     };
 
     /**
+     * Create styles
+     * @return {any}
+     */
+    private createDateStyles = () => {
+        return this.wb.createStyle({
+            font: {
+                color: "#1112ff",
+                size: 14,
+            },
+        });
+    };
+
+    /**
      * Get storage bucket based on configuration
      * @return {any}
      */
     private getBucket = () => admin.storage().bucket(configuration.bucketId);
 
     /**
+     * Create data row in the excel report
+     * @param {OperationBase} row information about operation
+     */
+    private createDataRow = (row: OperationBase): void => {
+        const rowDate = new Date(row.date);
+        this.ws.cell(this.rowNumber, 1).string(row.description)
+            .style(this.numberStyle);
+        this.ws.cell(this.rowNumber, 2).date(rowDate)
+            .style(this.dateStyle);
+        this.ws.cell(this.rowNumber, 3).number(row.sum)
+            .style(this.numberStyle);
+        this.ws.cell(this.rowNumber, 4).date(new Date())
+            .style(this.dateStyle);
+    };
+
+    /**
      * Handle save report operation file
      * @param {string} fileName
      * @return {string} path to the file
      */
-    public saveToFile = (fileName: string): string => {
+    public saveToFile = async (fileName: string): Promise<string> => {
         if (!this.data.length) {
             throw new Error("There is no data for report");
         }
 
-        this.ws.cell(1, 1)
-            .number(100)
-            .style(this.style);
+        for (let i = 0; i <= this.data.length; i++) {
+            this.rowNumber = i + 1;
+            if (this.data[i]) {
+                this.createDataRow(this.data[i]);
+            }
+        }
 
         const tempLocalResultFile = path.join(os.tmpdir(), fileName);
-
-        this.wb.write(tempLocalResultFile, function(err: any, stats: any) {
+        const buffer = await this.wb.writeToBuffer();
+        await fs.writeFile(tempLocalResultFile, buffer, function(err) {
             if (err) {
-                console.error(err);
-            } else {
-                console.log(stats);
-                // Prints out an instance of a node.js fs.Stats object
+                console.log(err);
             }
         });
 
@@ -92,21 +126,15 @@ export default class ExcelReport {
         };
         await this.getBucket().upload(path,
             {destination: resultFilePath, metadata: metadata});
-
-        fs.unlinkSync(path);
-
         const expDate = new Date();
         expDate.setTime(expDate.getTime() + 2 * 24 * 60 * 60 * 1000);
         const month = expDate.getMonth() + 1;
         const day = expDate.getDate();
         const year = expDate.getFullYear();
-
-        const config: GetSignedUrlConfig = {
+        const resultFile = this.getBucket().file(resultFilePath);
+        return await resultFile.getSignedUrl({
             action: "read",
             expires: `${month}-${day}-${year}`,
-        };
-
-        const resultFile = this.getBucket().file(resultFilePath);
-        return resultFile.getSignedUrl(config);
+        });
     };
 }

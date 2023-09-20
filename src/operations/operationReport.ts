@@ -2,6 +2,7 @@ import DataStoreService from "../DataStoreService";
 import * as functions from "firebase-functions";
 import {Datastore} from "@google-cloud/datastore";
 import ExcelReport from "../ExcelReport";
+import * as fs from "fs";
 
 export const operationReport = async (data: any, context: any) => {
     try {
@@ -22,9 +23,11 @@ export const operationReport = async (data: any, context: any) => {
             };
         });
         const excelReport = new ExcelReport(reportData);
-        const fileName = "new-report.xlsx";
-        const path = excelReport.saveToFile(fileName);
-        return await excelReport.uploadFileToBucket(path, fileName);
+        const fileName = `rep${new Date().getTime()}.xlsx`;
+        const path = await excelReport.saveToFile(fileName);
+        const url = await excelReport.uploadFileToBucket(path, fileName);
+        fs.unlinkSync(path);
+        return url;
     } catch (error: any) {
         const runQueryError: RunQueryError = error;
         throw new functions.https.HttpsError("internal",
