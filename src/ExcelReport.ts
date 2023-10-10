@@ -15,6 +15,7 @@ export default class ExcelReport {
     private readonly numberStyle: any;
     private readonly dateStyle: any;
     private rowNumber = 1;
+    private shift = 0;
     private readonly data: Array<OperationBase>;
 
     /**
@@ -26,11 +27,35 @@ export default class ExcelReport {
             dateFormat: "d-m-yy",
         });
         this.ws = this.wb.addWorksheet("Manetta report");
-        this.data = data;
+        this.data = data.sort(this.compareFn);
         this.dateStyle = this.createDateStyles();
         this.numberStyle = this.createNumberStyles();
         this.ws.column(1).setWidth(50);
     }
+
+    /**
+     * Compare function, used for sorting operation array
+     * @param a {OperationBase}
+     * @param b {OperationBase}
+     */
+    private compareFn = (a: OperationBase, b: OperationBase): number => {
+        const aTag = a.tags.join("");
+        const bTag = b.tags.join("");
+
+        if(aTag === bTag) {
+            return a.date > b.date ? 1 : -1;
+        }
+
+        if(~aTag.indexOf(bTag)) {
+            return -1;
+        }
+
+        if(~bTag.indexOf(aTag)) {
+            return 1;
+        }
+
+        return aTag.localeCompare(bTag);
+    };
 
     /**
      * Create styles
@@ -70,15 +95,20 @@ export default class ExcelReport {
      * @param {OperationBase} row information about operation
      */
     private createDataRow = (row: OperationBase): void => {
-        const rowDate = new Date(row.date);
-        this.ws.cell(this.rowNumber, 1).string(row.description)
-            .style(this.numberStyle);
-        this.ws.cell(this.rowNumber, 2).date(rowDate)
+        this.ws.cell(this.rowNumber, 2 + this.shift).date(new Date(row.date))
             .style(this.dateStyle);
-        this.ws.cell(this.rowNumber, 3).number(row.sum)
+        this.ws.cell(this.rowNumber, 3 + this.shift).number(row.sum)
             .style(this.numberStyle);
-        this.ws.cell(this.rowNumber, 4).date(new Date())
-            .style(this.dateStyle);
+        this.ws.cell(this.rowNumber, 4 + this.shift).string(row.description);
+    };
+
+    /**
+     * Create total row in the excel report
+     * @param tag {string} name of the group
+     */
+    private createTotalRow = (tag: string): void => {
+        this.ws.cell(this.rowNumber, 1 + this.shift).string(tag)
+            .style(this.numberStyle);
     };
 
     /**
@@ -90,9 +120,22 @@ export default class ExcelReport {
         if (!this.data.length) {
             throw new Error("There is no data for report");
         }
+        const tags: Array<string> = [];
 
-        for (let i = 0; i <= this.data.length; i++) {
-            this.rowNumber = i + 1;
+        for (let i = 0; i < this.data.length; i++) {
+            this.rowNumber++;
+            this.shift = this.data[i].tags.length - 1;
+
+            for (let j = 0; j < this.data[i].tags.length; j++) {
+                if (this.data[i].tags[j] !== tags[j]) {
+                    this.shift = j;
+                    this.createTotalRow(this.data[i].tags[j]);
+                    tags.length = j;
+                    tags.push(this.data[i].tags[j]);
+                    this.rowNumber++;
+                }
+            }
+
             if (this.data[i]) {
                 this.createDataRow(this.data[i]);
             }
