@@ -16,13 +16,14 @@ export const operationReport = async (data: any, context: any) => {
             return {
                 id: undefined,
                 account: entity.account.name,
-                date: entity.date.getTime(),
+                date: entity.date,
                 description: entity.description,
-                sum: entity.sum,
+                sum: entity.equivalent/100,
                 tags: entity.tags,
             };
         });
-        const excelReport = new ExcelReport(reportData);
+        const excelReport = new ExcelReport(reportData,
+            startDate || new Date(), endDate || new Date());
         const fileName = `rep${new Date().getTime()}.xlsx`;
         const path = await excelReport.saveToFile(fileName);
         const url = await excelReport.uploadFileToBucket(path, fileName);

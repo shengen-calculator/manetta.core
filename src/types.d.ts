@@ -106,3 +106,10 @@ type Account = {
     isActive: boolean,
     blocked: number,
 }
+
+type ReportRow = {
+    date: Date | null,
+    sum: number,
+    description: string,
+    tags: string[]
+}
