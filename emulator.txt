@@ -7,7 +7,8 @@ await setTimeout(5000);
 
 currency.getCurrencyRate({ currency: 'EUR' })
 
-
+operation.getPostedOperation({ startDate: "2023-09-10", endDate: "2023-09-12"})
+operation.operationReport({ startDate: "2023-09-10", endDate: "2023-09-12"})
 
 https://cloud.google.com/datastore/docs/configure-indexes-rest-api => Start Cloud Shell => gcloud auth print-access-token
 
@@ -61,5 +62,21 @@ SELECT * FROM posted WHERE account = KEY(account, 'PRIVAT-EUR') ORDER BY created
 
 SELECT * FROM rates WHERE __key__ HAS ANCESTOR KEY(currency, 'UAH') AND date < DATETIME('2023-02-23T00:00:00z') ORDER BY date DESC
 
+{
+  "kind": "operation",
+  "ancestor": "none",
+  "properties": [
+      {
+          "name": "user",
+          "direction": "ASCENDING"
+      },
+      {
+          "name": "created",
+          "direction": "ASCENDING"
+      }
+  ]
+}
+
+SELECT * FROM operation WHERE user = "fake.user@test.com" ORDER BY created
 
 firebase deploy --only functions:operation-getAllOperation

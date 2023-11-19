@@ -25,7 +25,7 @@ export const postOperations =
     try {
         await transaction.run();
         const dbOperations = await dataStoreService.getFilteredEntities(
-            "operation", "user", getUserEmailByContext(context));
+            "operation", "user", getUserEmailByContext(context), "created");
         const selectedDbOperations = dbOperations.filter((op) => {
             const key = op[datastore.KEY];
             return data.ids.includes(key.id);

@@ -2,6 +2,7 @@ import {Transaction} from "@google-cloud/datastore/build/src";
 import {Datastore} from "@google-cloud/datastore";
 import DataStoreService from "./DataStoreService";
 import * as functions from "firebase-functions";
+import Util from "./Util";
 
 /**
  * Represents a main operation service
@@ -46,6 +47,8 @@ export default class OperationStoreService {
                 await this.getCurrencyRate(
                     account.currency.name, operation.date);
         }
+
+        await this.updateTags(operation);
 
         await this.savePostedOperation(operation, docNumber, account);
         await this.dataStoreService.deleteEnityById("operation",
@@ -137,6 +140,30 @@ export default class OperationStoreService {
                 `Rate for currency "${currency}" must be provided.`);
         }
         return operationCurrencyRate.rate;
+    };
+    /**
+     * Update tags combination
+     * @param {Operation} operation
+     */
+    public updateTags = async (operation: Operation): Promise<void> => {
+        try {
+            const hashCode = Util.hashCode(operation.tags.toString());
+            const combination =
+                await this.dataStoreService.getEntityById("tag", hashCode);
+            if (!combination) {
+                await this.dataStoreService.insertEntity(
+                    "tag", hashCode, {
+                        tags: operation.tags,
+                    });
+            }
+        } catch (err: any) {
+            if (this.transaction) {
+                await this.transaction.rollback();
+            }
+            const runQueryError: RunQueryError = err;
+            throw new functions.https.HttpsError("internal",
+                runQueryError.details);
+        }
     };
 
     /**

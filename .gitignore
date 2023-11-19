@@ -29,6 +29,7 @@ firebase-debug.log*
 ui-debug.log*
 
 .firebaserc
+src/settings.ts
 
 # Compiled JavaScript files
 lib/**/*.js

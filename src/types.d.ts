@@ -61,26 +61,18 @@ type User = {
     role: ROLE
 }
 
-type CreateTagInput = {
-    tag: string
-}
-
-type DeleteTagInput = {
-    tag: string
-}
-
 type RunQueryError = {
     code: number,
     details: string
 }
 
 type SaveGroupInput = {
-    groupName: string,
+    name: string,
     tags: string[]
 }
 
 type DeleteGroupInput = {
-    groupName: string
+    name: string
 }
 
 type GetCurrencyRateInput = {
@@ -113,4 +105,11 @@ type Account = {
     currency: DbItem,
     isActive: boolean,
     blocked: number,
+}
+
+type ReportRow = {
+    date: Date | null,
+    sum: number,
+    description: string,
+    tags: string[]
 }

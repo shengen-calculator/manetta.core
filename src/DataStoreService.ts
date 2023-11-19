@@ -35,6 +35,19 @@ export default class DataStoreService {
     }
 
     /**
+     * Get entity by id
+     * @param {Entity} entity
+     * @param {number} id = key
+     */
+    public async getEntityById(entity: Entity, id: number) {
+        const key = this.datastore.key([entity, id]);
+        const [item] = this.transaction ?
+            await this.transaction.get(key) :
+            await this.datastore.get(key);
+        return item;
+    }
+
+    /**
      * Return only one single entity selected by equality filter
      * @param {Entity} entity
      * @param {string} filteredField
@@ -55,13 +68,19 @@ export default class DataStoreService {
      * @param {Entity} entity
      * @param {string} filteredField
      * @param {string} value
+     * @param {string} orderField
      */
-    public async getFilteredEntities(entity: Entity,
-                                     filteredField: string, value: string) {
+    public async getFilteredEntities(
+        entity: Entity,
+        filteredField: string, value: string,
+        orderField: string | undefined = undefined) {
         const storeQuery = this.transaction ?
             this.transaction.createQuery(entity) :
             this.datastore.createQuery(entity);
         storeQuery.filter(filteredField, "=", value);
+        if (orderField) {
+            storeQuery.order(orderField);
+        }
         const [items] = this.transaction ?
             await this.transaction.runQuery(storeQuery) :
             await this.datastore.runQuery(storeQuery);
@@ -131,6 +150,33 @@ export default class DataStoreService {
 
         const [entities] = queryResult;
         return entities.pop();
+    }
+
+    /**
+     * Get latest range of entities from the collection (sorted by date)
+     * @param {Entity} entity
+     * @param {string} orderField
+     * @param {string} startCursor
+     */
+    public async getNewestItems(entity: Entity,
+                                orderField: string, startCursor: string) {
+        const storeQuery = this.transaction ?
+            this.transaction.createQuery(entity) :
+            this.datastore.createQuery(entity);
+        storeQuery.order(orderField, {
+            descending: true,
+        });
+        storeQuery.limit(20);
+        storeQuery.start(startCursor);
+        const queryResult: RunQueryResponse = this.transaction ?
+            await this.transaction.runQuery(storeQuery) :
+            await this.datastore.runQuery(storeQuery);
+
+        const [entities, info] = queryResult;
+        return {
+            entities,
+            info,
+        };
     }
 
     /**
@@ -274,15 +320,20 @@ export default class DataStoreService {
     /**
      * Insert new Entity, key must be provided
      * @param {Entity} entity
-     * @param {string} key
+     * @param {number} key
      * @param {object} data
      */
-    public async insertEntity(entity: Entity, key: string, data: any) {
+    public async insertEntity(entity: Entity, key: number, data: any) {
         const entityKey = this.datastore.key([entity, key]);
-        return await this.datastore.insert({
-            key: entityKey,
-            data: data,
-        });
+        return this.transaction ?
+            await this.transaction.insert({
+                key: entityKey,
+                data: data,
+            }) :
+            await this.datastore.insert({
+                key: entityKey,
+                data: data,
+            });
     }
 
     /**
