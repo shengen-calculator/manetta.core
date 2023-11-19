@@ -30,9 +30,10 @@ export default class OperationStoreService {
      * Handle post operation for one operation entity
      * @param {Operation} operation
      * @param {number} docNumber
+     * @param {boolean} isRevert operation
      */
     public handleOperation = async (operation: Operation,
-                                    docNumber: number) => {
+                                    docNumber: number, isRevert = false) => {
         if (!this.balanceRecords[operation.account.name]) {
             this.balanceRecords[operation.account.name] =
                 await this.getAccountBalance(operation.account.name);
@@ -48,11 +49,16 @@ export default class OperationStoreService {
                     account.currency.name, operation.date);
         }
 
-        await this.updateTags(operation);
+        if (!isRevert) {
+            await this.updateTags(operation);
+        }
 
-        await this.savePostedOperation(operation, docNumber, account);
-        await this.dataStoreService.deleteEnityById("operation",
-            Number(operation.id));
+        await this.savePostedOperation(operation, docNumber, account, isRevert);
+
+        if (!isRevert) {
+            await this.dataStoreService.deleteEnityById("operation",
+                Number(operation.id));
+        }
     };
 
     /**
@@ -171,13 +177,15 @@ export default class OperationStoreService {
      * @param {Operation} operation
      * @param {number} docNumber
      * @param {Account} account
+     * @param {boolean} isRevert operation
      */
-    public savePostedOperation = async (
-        operation: Operation, docNumber: number, account: Account) => {
+    public savePostedOperation = async (operation: Operation,
+                                        docNumber: number,
+                                        account: Account,
+                                        isRevert = false) => {
         const rate = this.rateRecords[account.currency.name];
         try {
-            return await this.dataStoreService.insertEntityNewKey(
-                "posted", {
+            const entity = isRevert ? {
                 date: new Date(operation.date),
                 account: this.dataStoreService.getEntityKey(
                     "account", operation.account.name),
@@ -192,7 +200,26 @@ export default class OperationStoreService {
                 rate: rate,
                 created: operation.created,
                 user: operation.user,
-            });
+                isRevertOperation: true,
+            } : {
+                date: new Date(operation.date),
+                account: this.dataStoreService.getEntityKey(
+                    "account", operation.account.name),
+                description: operation.description,
+                currency: this.dataStoreService.getEntityKey(
+                    "currency", account.currency.name),
+                sum: operation.sum,
+                tags: operation.tags,
+                balance: this.balanceRecords[operation.account.name],
+                docNumber: docNumber,
+                equivalent: Math.round(100 * operation.sum / rate),
+                rate: rate,
+                created: operation.created,
+                user: operation.user,
+            };
+
+            return await this.dataStoreService
+                .insertEntityNewKey("posted", entity);
         } catch (err: any) {
             if (this.transaction) {
                 await this.transaction.rollback();

@@ -72,7 +72,7 @@ export default class DataStoreService {
      */
     public async getFilteredEntities(
         entity: Entity,
-        filteredField: string, value: string,
+        filteredField: string, value: string | number,
         orderField: string | undefined = undefined) {
         const storeQuery = this.transaction ?
             this.transaction.createQuery(entity) :
@@ -291,6 +291,25 @@ export default class DataStoreService {
             key: entityKey,
             data: data,
         });
+    }
+
+    /**
+     * Save existing record
+     * @param {Entity} entity
+     * @param {string} key
+     * @param {object} data
+     */
+    public async saveEntity(entity: Entity, key: number, data: any) {
+        const entityKey = this.datastore.key([entity, key]);
+        return this.transaction ?
+            await this.transaction.save({
+                key: entityKey,
+                data: data,
+            }) :
+            await this.datastore.save({
+                key: entityKey,
+                data: data,
+            });
     }
 
     /**
