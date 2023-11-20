@@ -51,6 +51,11 @@ interface PostedOperation extends OperationBase{
     isRevertOperation?: boolean
 }
 
+interface ReportOperation extends OperationBase{
+    isReverted?: boolean,
+    isRevertOperation?: boolean
+}
+
 type Entity = "group" | "tag" | "account" | "rate" |
     "user" | "currency" | "posted" | "operation";
 
