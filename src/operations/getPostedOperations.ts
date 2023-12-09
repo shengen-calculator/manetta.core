@@ -19,6 +19,8 @@ export const getPostedOperation = async (data: any, context: any) => {
                 description: entity.description,
                 sum: entity.sum,
                 tags: entity.tags,
+                isReverted: !!entity.isReverted,
+                isRevertOperation: !!entity.isRevertOperation,
             };
         });
     } catch (error: any) {

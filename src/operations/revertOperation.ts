@@ -28,13 +28,10 @@ export const revertOperation =
 
         // validation
         for (const operation of dbOperations) {
-            if (operation.isReverted) {
+            if (operation.isReverted || operation.isRevertOperation) {
                 throw new functions.https.HttpsError("invalid-argument",
-                    "Operation can not be reverted repeatedly.");
-            }
-            if (operation.isRevertOperation) {
-                throw new functions.https.HttpsError("invalid-argument",
-                    "Revert Operation can not be reverted.");
+                    `Looks like document already contains reverted or 
+                    revert operation.`);
             }
         }
 
