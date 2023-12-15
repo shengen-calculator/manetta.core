@@ -201,6 +201,7 @@ export default class OperationStoreService {
                 created: operation.created,
                 user: operation.user,
                 isRevertOperation: true,
+                isReverted: false,
             } : {
                 date: new Date(operation.date),
                 account: this.dataStoreService.getEntityKey(
@@ -216,6 +217,8 @@ export default class OperationStoreService {
                 rate: rate,
                 created: operation.created,
                 user: operation.user,
+                isRevertOperation: false,
+                isReverted: false,
             };
 
             return await this.dataStoreService

@@ -71,12 +71,12 @@ SELECT * FROM posted WHERE account = KEY(account, 'OTP-BLACK-UAH') AND isRevertO
           "direction": "ASCENDING"
       },
       {
-          "name": "created",
-          "direction": "DESCENDING"
-      },
-      {
           "name": "isRevertOperation",
           "direction": "ASCENDING"
+      },
+      {
+          "name": "created",
+          "direction": "DESCENDING"
       }
   ]
 }
