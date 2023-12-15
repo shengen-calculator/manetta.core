@@ -61,6 +61,26 @@ SELECT * FROM posted WHERE account = KEY(account, 'PRIVAT-EUR') ORDER BY created
   ]
 }
 
+SELECT * FROM posted WHERE account = KEY(account, 'OTP-BLACK-UAH') AND isRevertOperation = false ORDER BY created DESC LIMIT 1
+{
+  "kind": "posted",
+  "ancestor": "none",
+  "properties": [
+      {
+          "name": "account",
+          "direction": "ASCENDING"
+      },
+      {
+          "name": "created",
+          "direction": "DESCENDING"
+      },
+      {
+          "name": "isRevertOperation",
+          "direction": "ASCENDING"
+      }
+  ]
+}
+
 SELECT * FROM rates WHERE __key__ HAS ANCESTOR KEY(currency, 'UAH') AND date < DATETIME('2023-02-23T00:00:00z') ORDER BY date DESC
 
 {
@@ -81,3 +101,4 @@ SELECT * FROM rates WHERE __key__ HAS ANCESTOR KEY(currency, 'UAH') AND date < D
 SELECT * FROM operation WHERE user = "fake.user@test.com" ORDER BY created
 
 firebase deploy --only functions:operation-getAllOperation
+
