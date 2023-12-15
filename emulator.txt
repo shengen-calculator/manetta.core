@@ -61,15 +61,11 @@ SELECT * FROM posted WHERE account = KEY(account, 'PRIVAT-EUR') ORDER BY created
   ]
 }
 
-SELECT * FROM posted WHERE account = KEY(account, 'OTP-BLACK-UAH') AND isRevertOperation = false ORDER BY created DESC LIMIT 1
+SELECT * FROM posted WHERE isRevertOperation = false ORDER BY created DESC  LIMIT 1
 {
   "kind": "posted",
   "ancestor": "none",
   "properties": [
-      {
-          "name": "account",
-          "direction": "ASCENDING"
-      },
       {
           "name": "isRevertOperation",
           "direction": "ASCENDING"
