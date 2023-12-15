@@ -135,11 +135,16 @@ export default class DataStoreService {
      * Get one latest entity from the collection (sorted by date)
      * @param {Entity} entity
      * @param {string} orderField
+     * @param {boolean} excludeRevertRecords
      */
-    public async getNewestItem(entity: Entity, orderField: string) {
+    public async getNewestItem(entity: Entity, orderField: string,
+                               excludeRevertRecords = true) {
         const storeQuery = this.transaction ?
             this.transaction.createQuery(entity) :
             this.datastore.createQuery(entity);
+        if (excludeRevertRecords) {
+            storeQuery.filter("isRevertOperation", "=", false);
+        }
         storeQuery.order(orderField, {
             descending: true,
         });
