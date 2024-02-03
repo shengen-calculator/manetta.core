@@ -93,10 +93,12 @@ export default class DataStoreService {
      * @param {boolean} onlyKey projection only key
      * @param {Date | undefined} startDate
      * @param {Date | undefined} endDate
+     * @param {tags} tags applied for Operations
      */
     public async getAll(entity: Entity, onlyKey: boolean,
                         startDate: Date | undefined = undefined,
-                        endDate: Date | undefined = undefined) {
+                        endDate: Date | undefined = undefined,
+                        tags: string[] = []) {
         let items: any[] = [];
         let endCursor: string | undefined;
         let moreResults: string | undefined = undefined;
@@ -111,6 +113,9 @@ export default class DataStoreService {
                 }
                 if (endDate) {
                     storeQuery.filter("date", "<=", endDate);
+                }
+                for (const tag of tags) {
+                    storeQuery.filter("tags", "=", tag);
                 }
                 storeQuery.limit(200);
                 if (endCursor) {
