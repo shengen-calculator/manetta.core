@@ -11,8 +11,8 @@ export const operationReport = async (data: any, context: any) => {
         const startDate = data.startDate ? new Date(data.startDate) : undefined;
         const endDate = data.endDate ? new Date(data.endDate) : undefined;
         const operations = await dataStoreService
-            .getAll("posted", false, startDate, endDate);
-        const reportData: Array<OperationBase> = operations.map((entity) => {
+            .getAll("posted", false, startDate, endDate, data.tags);
+        const reportData: Array<ReportOperation> = operations.map((entity) => {
             return {
                 id: undefined,
                 account: entity.account.name,
@@ -20,6 +20,8 @@ export const operationReport = async (data: any, context: any) => {
                 description: entity.description,
                 sum: entity.equivalent/100,
                 tags: entity.tags,
+                isReverted: entity.isReverted,
+                isRevertOperation: entity.isRevertOperation,
             };
         });
         const excelReport = new ExcelReport(reportData,

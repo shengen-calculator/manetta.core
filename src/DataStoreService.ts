@@ -72,7 +72,7 @@ export default class DataStoreService {
      */
     public async getFilteredEntities(
         entity: Entity,
-        filteredField: string, value: string,
+        filteredField: string, value: string | number,
         orderField: string | undefined = undefined) {
         const storeQuery = this.transaction ?
             this.transaction.createQuery(entity) :
@@ -93,10 +93,12 @@ export default class DataStoreService {
      * @param {boolean} onlyKey projection only key
      * @param {Date | undefined} startDate
      * @param {Date | undefined} endDate
+     * @param {tags} tags applied for Operations
      */
     public async getAll(entity: Entity, onlyKey: boolean,
                         startDate: Date | undefined = undefined,
-                        endDate: Date | undefined = undefined) {
+                        endDate: Date | undefined = undefined,
+                        tags: string[] = []) {
         let items: any[] = [];
         let endCursor: string | undefined;
         let moreResults: string | undefined = undefined;
@@ -111,6 +113,9 @@ export default class DataStoreService {
                 }
                 if (endDate) {
                     storeQuery.filter("date", "<=", endDate);
+                }
+                for (const tag of tags) {
+                    storeQuery.filter("tags", "=", tag);
                 }
                 storeQuery.limit(200);
                 if (endCursor) {
@@ -135,11 +140,16 @@ export default class DataStoreService {
      * Get one latest entity from the collection (sorted by date)
      * @param {Entity} entity
      * @param {string} orderField
+     * @param {boolean} excludeRevertRecords
      */
-    public async getNewestItem(entity: Entity, orderField: string) {
+    public async getNewestItem(entity: Entity, orderField: string,
+                               excludeRevertRecords = true) {
         const storeQuery = this.transaction ?
             this.transaction.createQuery(entity) :
             this.datastore.createQuery(entity);
+        if (excludeRevertRecords) {
+            storeQuery.filter("isRevertOperation", "=", false);
+        }
         storeQuery.order(orderField, {
             descending: true,
         });
@@ -291,6 +301,25 @@ export default class DataStoreService {
             key: entityKey,
             data: data,
         });
+    }
+
+    /**
+     * Save existing record
+     * @param {Entity} entity
+     * @param {string} key
+     * @param {object} data
+     */
+    public async saveEntity(entity: Entity, key: number, data: any) {
+        const entityKey = this.datastore.key([entity, key]);
+        return this.transaction ?
+            await this.transaction.save({
+                key: entityKey,
+                data: data,
+            }) :
+            await this.datastore.save({
+                key: entityKey,
+                data: data,
+            });
     }
 
     /**

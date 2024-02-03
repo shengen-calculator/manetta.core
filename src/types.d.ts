@@ -34,6 +34,10 @@ type PostOperationInput = {
     ids: Array<string>
 }
 
+type RevertOperationInput = {
+    docNumber: number
+}
+
 interface PostedOperation extends OperationBase{
     account: DbItem,
     currency: DbItem,
@@ -43,6 +47,13 @@ interface PostedOperation extends OperationBase{
     equivalent: number,
     rate: number,
     created: Date,
+    isReverted?: boolean,
+    isRevertOperation?: boolean
+}
+
+interface ReportOperation extends OperationBase{
+    isReverted?: boolean,
+    isRevertOperation?: boolean
 }
 
 type Entity = "group" | "tag" | "account" | "rate" |

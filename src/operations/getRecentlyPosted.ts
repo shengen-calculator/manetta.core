@@ -27,6 +27,8 @@ export const getRecentlyPosted = async (data: any, context: any) => {
                 balance: entity.balance - blockedMap.get(entity.account.name),
                 sum: entity.sum,
                 tags: entity.tags,
+                isReverted: !!entity.isReverted,
+                isRevertOperation: !!entity.isRevertOperation,
             };
         });
         return {

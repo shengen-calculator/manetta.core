@@ -12,7 +12,7 @@ const xl = require("excel4node");
 export default class ExcelReport {
     private readonly wb: any;
     private readonly ws: any;
-    private readonly data: Array<OperationBase>;
+    private readonly data: Array<ReportOperation>;
     private readonly startDate: Date;
     private readonly endDate: Date;
     private readonly reportRows: Array<ReportRow> = new Array<ReportRow>();
@@ -159,6 +159,9 @@ export default class ExcelReport {
         this.countTotals();
 
         orderedData.forEach((operation) => {
+            if (operation.isReverted || operation.isRevertOperation) {
+                return;
+            }
             for (let i = 0; i < operation.tags.length; i++) {
                 while (this.tags.length > operation.tags.length) {
                     this.removeTag();
