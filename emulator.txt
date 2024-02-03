@@ -45,6 +45,22 @@ SELECT * FROM posted WHERE currency = KEY(currency, 'UAH') ORDER BY date DESC
       }
   ]
 }
+SELECT * FROM posted WHERE date > DATETIME('2023-01-01T23:59:59z') AND date < DATETIME('2024-02-05T23:59:59z') AND tags = 'fenix'
+{
+  "kind": "posted",
+  "ancestor": "none",
+  "properties": [
+      {
+          "name": "tags",
+          "direction": "ASCENDING"
+      },
+      {
+          "name": "date",
+          "direction": "DESCENDING"
+      }
+  ]
+}
+
 SELECT * FROM posted WHERE account = KEY(account, 'PRIVAT-EUR') ORDER BY created DESC
 {
   "kind": "posted",
