@@ -216,34 +216,6 @@ export default class DataStoreService {
     }
 
     /**
-     * Get one newest entity, selected by ancestor and limited by max Date
-     * @param {Entity} entity
-     * @param {Entity} ancestor
-     * @param {string} key
-     * @param {Date} maxDate
-     */
-    public async getNewestNestedItemLimitedByMaxDate(
-        entity: Entity, ancestor: Entity, key: string, maxDate: Date) {
-        const ancestorKey = this.datastore.key([ancestor, key]);
-
-        const storeQuery = this.transaction ?
-            this.transaction.createQuery(entity).hasAncestor(ancestorKey) :
-            this.datastore.createQuery(entity).hasAncestor(ancestorKey);
-
-        storeQuery.filter("date", "<", maxDate);
-        storeQuery.order("date", {
-            descending: true,
-        });
-        storeQuery.limit(1);
-        const queryResult: RunQueryResponse = this.transaction ?
-            await this.transaction.runQuery(storeQuery) :
-            await this.datastore.runQuery(storeQuery);
-
-        const [entities] = queryResult;
-        return entities.pop();
-    }
-
-    /**
      * Get one newest entity filtered by value and ordered by any field
      * @param {Entity} entity
      * @param {string} filteredField
@@ -334,16 +306,16 @@ export default class DataStoreService {
 
     /**
      * Get Entity KEY
-     * @param {Datastore} datastore
      * @param {Entity} entity
      * @param {Entity} ancestor
      * @param {string} ancestorKey
      * @return {entity.Key}
      */
     public getDatastoreNestedEntityNewKey(
-        datastore: Datastore, entity: Entity,
-        ancestor: Entity, ancestorKey: string) {
-        return datastore.key([ancestor, ancestorKey, entity]);
+        entity: Entity, ancestor: Entity, ancestorKey: string) {
+        return this.transaction ?
+            this.transaction.key([ancestor, ancestorKey, entity]) :
+            this.datastore.key([ancestor, ancestorKey, entity]);
     }
 
     /**
