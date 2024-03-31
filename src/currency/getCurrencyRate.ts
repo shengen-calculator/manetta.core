@@ -13,18 +13,22 @@ export const getCurrencyRate =
             const key = entity[datastore.KEY];
             return key.name;
         });
-        const allRates: GetCurrencyRateResult[] = [];
+        const allRates = [];
         for (const currency of currencies) {
             const actualCurrencyRate: GetCurrencyRateResult =
                 await dataStoreService.getNewestNestedItem("rate",
                     "currency", currency);
-            allRates.push(actualCurrencyRate);
+            allRates.push({
+                ...actualCurrencyRate,
+                currency,
+            });
         }
 
         return allRates.map((cr) => {
             return {
                 rate: cr.rate,
                 date: cr.date.getTime(),
+                currency: cr.currency,
             };
         });
     } catch (error: any) {
