@@ -97,8 +97,7 @@ type GetCurrencyRateResult = {
 
 type AddCurrencyRateInput = {
     currency: string,
-    rate: number,
-    date: string,
+    rate: number
 }
 
 type SaveAccountInput = {
