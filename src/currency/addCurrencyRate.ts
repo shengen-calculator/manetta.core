@@ -15,7 +15,7 @@ export const addCurrencyRate =
         await datastore.insert({
             key: rateKey,
             data: {
-                date: new Date().getTime(),
+                date: new Date(),
                 rate: data.rate,
                 user: getUserEmailByContext(context),
             },
