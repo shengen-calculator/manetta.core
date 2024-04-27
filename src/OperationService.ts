@@ -45,8 +45,7 @@ export default class OperationStoreService {
             await this.getAccountByName(operation.account.name);
         if (!this.rateRecords[account.currency.name]) {
             this.rateRecords[account.currency.name] =
-                await this.getCurrencyRate(
-                    account.currency.name, operation.date);
+                await this.getCurrencyRate(account.currency.name);
         }
 
         if (!isRevert) {
@@ -123,15 +122,13 @@ export default class OperationStoreService {
     /**
      * Get currency rate for a specific date
      * @param {string} currency
-     * @param {Date} operationDate
      */
-    public getCurrencyRate = async (currency: string,
-                                    operationDate: Date): Promise<number> => {
+    public getCurrencyRate = async (currency: string): Promise<number> => {
         let operationCurrencyRate: GetCurrencyRateResult;
         try {
             operationCurrencyRate = await this.dataStoreService
-                .getNewestNestedItemLimitedByMaxDate("rate",
-                    "currency", currency, operationDate);
+                .getNewestNestedItem("rate",
+                    "currency", currency);
         } catch (err: any) {
             if (this.transaction) {
                 await this.transaction.rollback();
