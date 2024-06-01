@@ -1,0 +1,116 @@
+export GOOGLE_APPLICATION_CREDENTIALS="key.json"
+
+
+import {setTimeout} from "timers/promises";
+await setTimeout(5000);
+
+
+currency.getCurrencyRate({ currency: 'EUR' })
+
+operation.getPostedOperation({ startDate: "2023-09-10", endDate: "2023-09-12"})
+operation.operationReport({ startDate: "2023-09-10", endDate: "2023-09-12"})
+operation.revertOperation({docNumber: 1277})
+operation.postOperations({data: {postAsSingle:false, ids:["5749494150856704"]}})
+
+https://cloud.google.com/datastore/docs/configure-indexes-rest-api => Start Cloud Shell => gcloud auth print-access-token
+
+SELECT * FROM rates WHERE __key__ HAS ANCESTOR KEY(currency, 'UAH') ORDER BY date DESC
+
+POST => https://datastore.googleapis.com/v1/projects/manetta-2023/indexes
+
+{
+  "kind": "rate",
+  "ancestor": "ALL_ANCESTORS",
+  "properties": [
+      {
+          "name": "date",
+          "direction": "DESCENDING"
+      }
+  ]
+}
+
+
+SELECT * FROM posted WHERE currency = KEY(currency, 'UAH') ORDER BY date DESC
+
+{
+  "kind": "posted",
+  "ancestor": "none",
+  "properties": [
+      {
+          "name": "currency",
+          "direction": "ASCENDING"
+      },
+      {
+          "name": "date",
+          "direction": "DESCENDING"
+      }
+  ]
+}
+SELECT * FROM posted WHERE date > DATETIME('2023-01-01T23:59:59z') AND date < DATETIME('2024-02-05T23:59:59z') AND tags = 'fenix'
+{
+  "kind": "posted",
+  "ancestor": "none",
+  "properties": [
+      {
+          "name": "tags",
+          "direction": "ASCENDING"
+      },
+      {
+          "name": "date",
+          "direction": "DESCENDING"
+      }
+  ]
+}
+
+SELECT * FROM posted WHERE account = KEY(account, 'PRIVAT-EUR') ORDER BY created DESC
+{
+  "kind": "posted",
+  "ancestor": "none",
+  "properties": [
+      {
+          "name": "account",
+          "direction": "ASCENDING"
+      },
+      {
+          "name": "created",
+          "direction": "DESCENDING"
+      }
+  ]
+}
+
+SELECT * FROM posted WHERE isRevertOperation = false ORDER BY created DESC  LIMIT 1
+{
+  "kind": "posted",
+  "ancestor": "none",
+  "properties": [
+      {
+          "name": "isRevertOperation",
+          "direction": "ASCENDING"
+      },
+      {
+          "name": "created",
+          "direction": "DESCENDING"
+      }
+  ]
+}
+
+SELECT * FROM rates WHERE __key__ HAS ANCESTOR KEY(currency, 'UAH') AND date < DATETIME('2023-02-23T00:00:00z') ORDER BY date DESC
+
+{
+  "kind": "operation",
+  "ancestor": "none",
+  "properties": [
+      {
+          "name": "user",
+          "direction": "ASCENDING"
+      },
+      {
+          "name": "created",
+          "direction": "ASCENDING"
+      }
+  ]
+}
+
+SELECT * FROM operation WHERE user = "fake.user@test.com" ORDER BY created
+
+firebase deploy --only functions:operation-getAllOperation
