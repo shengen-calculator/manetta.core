@@ -137,6 +137,48 @@ export default class DataStoreService {
     }
 
     /**
+     * Getting all entities from the collection (multi call if necessary)
+     * @param {Entity} entity
+     * @param {string} startCursor
+     * @param {Date | undefined} startDate
+     * @param {Date | undefined} endDate
+     * @param {tags} tags applied for Operations
+     */
+    public async getNewestFilteredItems(entity: Entity, startCursor: string,
+                                        startDate: Date | undefined = undefined,
+                                        endDate: Date | undefined = undefined,
+                                        tags: string[] = []) {
+        const storeQuery = this.transaction ?
+            this.transaction.createQuery(entity) :
+            this.datastore.createQuery(entity);
+
+        if (startDate) {
+            storeQuery.filter("date", ">=", startDate);
+        }
+        if (endDate) {
+            storeQuery.filter("date", "<=", endDate);
+        }
+        for (const tag of tags) {
+            storeQuery.filter("tags", "=", tag);
+        }
+
+        storeQuery.order("created", {
+            descending: true,
+        });
+        storeQuery.limit(20);
+        storeQuery.start(startCursor);
+        const queryResult: RunQueryResponse = this.transaction ?
+            await this.transaction.runQuery(storeQuery) :
+            await this.datastore.runQuery(storeQuery);
+
+        const [entities, info] = queryResult;
+        return {
+            entities,
+            info,
+        };
+    }
+
+    /**
      * Get one latest entity from the collection (sorted by date)
      * @param {Entity} entity
      * @param {string} orderField
