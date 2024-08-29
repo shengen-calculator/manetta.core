@@ -1,5 +1,5 @@
 import {Datastore} from "@google-cloud/datastore";
-import * as functions from "firebase-functions";
+import {HttpsError} from "firebase-functions/v2/https";
 import {RunQueryResponse} from "@google-cloud/datastore/build/src/query";
 import {Transaction} from "@google-cloud/datastore/build/src";
 
@@ -131,7 +131,7 @@ export default class DataStoreService {
             return items;
         } catch (error: any) {
             const runQueryError: RunQueryError = error;
-            throw new functions.https.HttpsError("internal",
+            throw new HttpsError("internal",
                 runQueryError.details);
         }
     }

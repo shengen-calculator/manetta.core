@@ -1,11 +1,13 @@
 import {Datastore} from "@google-cloud/datastore";
-import * as functions from "firebase-functions";
+import {HttpsError} from "firebase-functions/v2/https";
 import DataStoreService from "../DataStoreService";
 import {getUserEmailByContext} from "../auth/authHelper";
+import {CallableRequest} from "firebase-functions/lib/common/providers/https";
 
-export const saveOperation = async (data: SaveOperationInput, context: any) => {
+export const saveOperation = async (request: CallableRequest) => {
     try {
         const datastore = new Datastore();
+        const data: SaveOperationInput = request.data;
         const dataStoreService = new DataStoreService(datastore);
         const account = dataStoreService.getEntityKey("account", data.account);
         if (data.id) {
@@ -17,7 +19,7 @@ export const saveOperation = async (data: SaveOperationInput, context: any) => {
                 group: data.group,
                 description: data.description,
                 tags: data.tags,
-                user: getUserEmailByContext(context),
+                user: getUserEmailByContext(request),
             });
         }
         return await dataStoreService.insertEntityNewKey("operation", {
@@ -28,11 +30,11 @@ export const saveOperation = async (data: SaveOperationInput, context: any) => {
             description: data.description,
             created: new Date().getTime(),
             tags: data.tags,
-            user: getUserEmailByContext(context),
+            user: getUserEmailByContext(request),
         });
     } catch (error: any) {
         const runQueryError: RunQueryError = error;
-        throw new functions.https.HttpsError("internal",
+        throw new HttpsError("internal",
             runQueryError.details);
     }
 };

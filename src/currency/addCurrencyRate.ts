@@ -1,10 +1,12 @@
 import {Datastore} from "@google-cloud/datastore";
-import * as functions from "firebase-functions";
+import {HttpsError} from "firebase-functions/v2/https";
 import DataStoreService from "../DataStoreService";
 import {getUserEmailByContext} from "../auth/authHelper";
+import {CallableRequest} from "firebase-functions/lib/common/providers/https";
 
 export const addCurrencyRate =
-    async (data: AddCurrencyRateInput, context: any) => {
+    async (request: CallableRequest) => {
+    const data: AddCurrencyRateInput = request.data;
     const datastore = new Datastore();
     const dataStoreService = new DataStoreService(datastore);
 
@@ -17,12 +19,12 @@ export const addCurrencyRate =
             data: {
                 date: new Date(),
                 rate: data.rate,
-                user: getUserEmailByContext(context),
+                user: getUserEmailByContext(request),
             },
         });
     } catch (err: any) {
         const runQueryError: RunQueryError = err;
-        throw new functions.https.HttpsError("internal",
+        throw new HttpsError("internal",
             runQueryError.details);
     }
 };

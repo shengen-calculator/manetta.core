@@ -1,4 +1,4 @@
-import * as functions from "firebase-functions";
+import {HttpsError} from "firebase-functions/v2/https";
 import {
     AuthUserRecord,
 } from "firebase-functions/lib/common/providers/identity";
@@ -11,12 +11,12 @@ export const onCreate = async (user: AuthUserRecord) => {
         dbUser = await getUserByEmail(user);
     } catch (error: any) {
         const runQueryError: RunQueryError = error;
-        throw new functions.https.HttpsError("internal",
+        throw new HttpsError("internal",
             runQueryError.details);
     }
 
     if (!dbUser) {
-        throw new functions.auth.HttpsError("invalid-argument",
+        throw new HttpsError("invalid-argument",
             `Unauthorized email "${user.email}"`);
     }
     try {
@@ -27,7 +27,7 @@ export const onCreate = async (user: AuthUserRecord) => {
         await admin.auth().setCustomUserClaims(user.uid, customClaims);
     } catch (error: any) {
         const runQueryError: RunQueryError = error;
-        throw new functions.https.HttpsError("internal",
+        throw new HttpsError("internal",
             runQueryError.details);
     }
 };

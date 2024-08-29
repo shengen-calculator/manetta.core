@@ -1,7 +1,7 @@
 import {Transaction} from "@google-cloud/datastore/build/src";
 import {Datastore} from "@google-cloud/datastore";
 import DataStoreService from "./DataStoreService";
-import * as functions from "firebase-functions";
+import {HttpsError} from "firebase-functions/v2/https";
 import Util from "./Util";
 
 /**
@@ -77,7 +77,7 @@ export default class OperationStoreService {
                 await this.transaction.rollback();
             }
             const runQueryError: RunQueryError = err;
-            throw new functions.https.HttpsError("internal",
+            throw new HttpsError("internal",
                 runQueryError.details);
         }
     };
@@ -98,7 +98,7 @@ export default class OperationStoreService {
                 await this.transaction.rollback();
             }
             const runQueryError: RunQueryError = err;
-            throw new functions.https.HttpsError("internal",
+            throw new HttpsError("internal",
                 runQueryError.details);
         }
     };
@@ -118,7 +118,7 @@ export default class OperationStoreService {
                 await this.transaction.rollback();
             }
             const runQueryError: RunQueryError = err;
-            throw new functions.https.HttpsError("internal",
+            throw new HttpsError("internal",
                 runQueryError.details);
         }
     };
@@ -138,12 +138,12 @@ export default class OperationStoreService {
                 await this.transaction.rollback();
             }
             const runQueryError: RunQueryError = err;
-            throw new functions.https.HttpsError("internal",
+            throw new HttpsError("internal",
                 runQueryError.details);
         }
 
         if (!operationCurrencyRate) {
-            throw new functions.auth.HttpsError("invalid-argument",
+            throw new HttpsError("invalid-argument",
                 `Rate for currency "${currency}" must be provided.`);
         }
         return operationCurrencyRate.rate;
@@ -168,7 +168,7 @@ export default class OperationStoreService {
                 await this.transaction.rollback();
             }
             const runQueryError: RunQueryError = err;
-            throw new functions.https.HttpsError("internal",
+            throw new HttpsError("internal",
                 runQueryError.details);
         }
     };
@@ -231,7 +231,7 @@ export default class OperationStoreService {
                 await this.transaction.rollback();
             }
             const runQueryError: RunQueryError = err;
-            throw new functions.https.HttpsError("internal",
+            throw new HttpsError("internal",
                 runQueryError.details);
         }
     };

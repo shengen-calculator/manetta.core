@@ -1,8 +1,9 @@
 import DataStoreService from "../DataStoreService";
-import * as functions from "firebase-functions";
+import {HttpsError} from "firebase-functions/v2/https";
 import {Datastore} from "@google-cloud/datastore";
+import {CallableRequest} from "firebase-functions/lib/common/providers/https";
 
-export const getRecentlyPosted = async (data: any, context: any) => {
+export const getRecentlyPosted = async (request: CallableRequest) => {
     try {
         const datastore = new Datastore();
         const dataStoreService = new DataStoreService(datastore);
@@ -14,7 +15,7 @@ export const getRecentlyPosted = async (data: any, context: any) => {
         });
 
         const result = await dataStoreService
-            .getNewestItems("posted", "created", data.startCursor);
+            .getNewestItems("posted", "created", request.data.startCursor);
         const entries = result.entities.map((entity) => {
             const key = entity[datastore.KEY];
             return {
@@ -38,7 +39,7 @@ export const getRecentlyPosted = async (data: any, context: any) => {
         };
     } catch (error: any) {
         const runQueryError: RunQueryError = error;
-        throw new functions.https.HttpsError("internal",
+        throw new HttpsError("internal",
             runQueryError.details);
     }
 };
