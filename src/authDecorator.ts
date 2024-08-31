@@ -3,16 +3,17 @@ import {setGlobalOptions} from "firebase-functions/v2";
 import {onCall, HttpsError} from "firebase-functions/v2/https";
 import * as logger from "firebase-functions/logger";
 
+setGlobalOptions({region: "europe-west1"});
+
 export const authDecorator =
-    (fn: (request: CallableRequest) => any, roles: ROLE[]) => {
-        setGlobalOptions({region: "europe-west1"});
-        onCall((request: CallableRequest) => {
+    (fn: (...args: any[]) => any, roles: ROLE[]) =>
+        onCall((request: any) => {
             return decorated(fn(request), roles, request);
         });
-    };
+
 
 const decorated = (wrapped: Promise<any>, roles: ROLE[],
-                         request: CallableRequest) => {
+                   request: CallableRequest) => {
     const wrapper = (request: CallableRequest) => {
         if (!process.env.FUNCTIONS_EMULATOR) {
             logger.info(request.auth?.token);
