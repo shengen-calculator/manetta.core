@@ -1,13 +1,18 @@
-import * as functions from "firebase-functions";
+import {
+    beforeUserCreated,
+    beforeUserSignedIn,
+} from "firebase-functions/v2/identity";
 import {beforeCreate} from "./auth/beforeCreateUser";
-import {onCreate} from "./auth/onCreateUser";
+import {beforeSignIn} from "./auth/beforeSignIn";
+import {setGlobalOptions} from "firebase-functions/v2";
 
-exports.beforeCreate = functions.region("europe-west1")
-    .auth.user().beforeCreate((user, context) => {
-        return beforeCreate(user);
+
+setGlobalOptions({region: "europe-west1"});
+
+exports.beforeCreate = beforeUserCreated((event) => {
+        return beforeCreate(event.data);
     });
 
-exports.onCreate = functions.region("europe-west1")
-    .auth.user().onCreate((user) => {
-        return onCreate(user);
+exports.beforeSignIn = beforeUserSignedIn((event) => {
+        return beforeSignIn(event.data);
     });

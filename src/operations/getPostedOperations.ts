@@ -1,10 +1,12 @@
 import DataStoreService from "../DataStoreService";
-import * as functions from "firebase-functions";
+import {HttpsError} from "firebase-functions/v2/https";
 import {Datastore} from "@google-cloud/datastore";
+import {CallableRequest} from "firebase-functions/lib/common/providers/https";
 
-export const getPostedOperation = async (data: any, context: any) => {
+export const getPostedOperation = async (request: CallableRequest) => {
     try {
         const datastore = new Datastore();
+        const data: GetPostedOperationInput = request.data;
         const dataStoreService = new DataStoreService(datastore);
         const startDate = data.startDate ? new Date(data.startDate) : undefined;
         const endDate = data.endDate ? new Date(data.endDate) : undefined;
@@ -25,7 +27,7 @@ export const getPostedOperation = async (data: any, context: any) => {
         });
     } catch (error: any) {
         const runQueryError: RunQueryError = error;
-        throw new functions.https.HttpsError("internal",
+        throw new HttpsError("internal",
             runQueryError.details);
     }
 };

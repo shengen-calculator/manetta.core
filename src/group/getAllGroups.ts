@@ -1,8 +1,9 @@
 import {Datastore} from "@google-cloud/datastore";
-import * as functions from "firebase-functions";
+import {HttpsError} from "firebase-functions/v2/https";
 import DataStoreService from "../DataStoreService";
+import {CallableRequest} from "firebase-functions/lib/common/providers/https";
 
-export const getAllGroups = async (data: any, context: any) => {
+export const getAllGroups = async (request: CallableRequest) => {
     try {
         const datastore = new Datastore();
         const dataStoreService = new DataStoreService(datastore);
@@ -16,7 +17,7 @@ export const getAllGroups = async (data: any, context: any) => {
         });
     } catch (error: any) {
         const runQueryError: RunQueryError = error;
-        throw new functions.https.HttpsError("internal",
+        throw new HttpsError("internal",
             runQueryError.details);
     }
 };

@@ -1,29 +1,32 @@
-import * as functions from "firebase-functions";
-import {CallableContext} from "firebase-functions/lib/common/providers/https";
+import {CallableRequest} from "firebase-functions/lib/common/providers/https";
+import {setGlobalOptions} from "firebase-functions/v2";
+import {onCall, HttpsError} from "firebase-functions/v2/https";
+import * as logger from "firebase-functions/logger";
 
-export const authDecorator = (fn: (...args: any[]) => any, roles: ROLE[]) =>
-    functions.region("europe-west1")
-    .https.onCall( (data, context) => {
-    return decorated(fn(data, context), roles, context);
-});
+setGlobalOptions({region: "europe-west1"});
+
+export const authDecorator =
+    (fn: (...args: any[]) => any, roles: ROLE[]) =>
+        onCall((request: any) => {
+            return decorated(fn(request), roles, request);
+        });
 
 
 const decorated = (wrapped: Promise<any>, roles: ROLE[],
-                         callableContext: CallableContext) => {
-    const wrapper = (...args: any) => {
-        const [context] = args;
+                   request: CallableRequest) => {
+    const wrapper = (request: CallableRequest) => {
         if (!process.env.FUNCTIONS_EMULATOR) {
-            functions.logger.log(context.auth.token);
-            if (!context.auth) {
-                throw new functions.https.HttpsError("failed-precondition",
+            logger.info(request.auth?.token);
+            if (!request.auth) {
+                throw new HttpsError("failed-precondition",
                     "The function must be called while authenticated.");
-            } else if (!~roles.indexOf(context.auth.token.role)) {
-                throw new functions.https.HttpsError("failed-precondition",
+            } else if (!~roles.indexOf(request.auth?.token?.role)) {
+                throw new HttpsError("failed-precondition",
                     `Only ${roles} can call this function`);
             }
         }
         return wrapped;
     };
-    return wrapper(callableContext);
+    return wrapper(request);
 };
 

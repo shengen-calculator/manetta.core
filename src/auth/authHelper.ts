@@ -1,6 +1,7 @@
 import DataStoreService from "../DataStoreService";
 import {Datastore} from "@google-cloud/datastore";
 import {AuthUserRecord} from "firebase-functions/lib/common/providers/identity";
+import {CallableRequest} from "firebase-functions/lib/common/providers/https";
 
 export const getUserByEmail = async (user: AuthUserRecord): Promise<User> => {
     const datastore = new Datastore();
@@ -10,6 +11,6 @@ export const getUserByEmail = async (user: AuthUserRecord): Promise<User> => {
 };
 
 export const getUserEmailByContext =
-    (context: any): string => context.auth ?
-        context.auth.token.email :
+    (request: CallableRequest): string => request.auth?.token?.email ?
+        request.auth.token.email :
         "fake.user@test.com";

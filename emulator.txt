@@ -113,4 +113,43 @@ SELECT * FROM rates WHERE __key__ HAS ANCESTOR KEY(currency, 'UAH') AND date < D
 
 SELECT * FROM operation WHERE user = "fake.user@test.com" ORDER BY created
 
+{
+  "kind": "posted",
+  "ancestor": "none",
+  "properties": [
+      {
+          "name": "created",
+          "direction": "DESCENDING"
+      },
+      {
+          "name": "date",
+          "direction": "DESCENDING"
+      }
+  ]
+}
+
+SELECT * FROM posted WHERE date > DATETIME('2023-01-01T23:59:59z') AND date < DATETIME('2024-02-05T23:59:59z') ORDER BY created DESC
+
+
+{
+  "kind": "posted",
+  "ancestor": "none",
+  "properties": [
+      {
+          "name": "tags",
+          "direction": "ASCENDING"
+      },
+      {
+          "name": "created",
+          "direction": "DESCENDING"
+      },
+      {
+          "name": "date",
+          "direction": "DESCENDING"
+      }
+  ]
+}
+
+SELECT * FROM posted WHERE date > DATETIME('2023-01-01T23:59:59z') AND date < DATETIME('2024-02-05T23:59:59z') AND tags = 'fenix' ORDER BY created DESC
+
 firebase deploy --only functions:operation-getAllOperation
