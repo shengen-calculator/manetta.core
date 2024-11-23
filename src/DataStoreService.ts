@@ -106,7 +106,8 @@ export default class DataStoreService {
         let moreResults: string | undefined = undefined;
         let requestNumber = 0;
         try {
-            while (moreResults !== Datastore.NO_MORE_RESULTS && requestNumber < this.MAX_REQUEST_NUMBER) {
+            while (moreResults !== Datastore.NO_MORE_RESULTS &&
+            requestNumber < this.MAX_REQUEST_NUMBER) {
                 const storeQuery = this.datastore.createQuery(entity);
                 if (onlyKey) {
                     storeQuery.select("__key__");
