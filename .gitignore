@@ -35,6 +35,9 @@ src/settings.ts
 lib/**/*.js
 lib/**/*.js.map
 
+# dotenv environment variables file
+.env
+
 # TypeScript v1 declaration files
 typings/
 
