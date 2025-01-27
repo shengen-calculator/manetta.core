@@ -1,12 +1,14 @@
 import {Datastore} from "@google-cloud/datastore";
 import {getUserEmailByContext} from "../auth/authHelper";
-import * as functions from "firebase-functions";
+import {HttpsError} from "firebase-functions/v2/https";
 import OperationService from "../OperationService";
 import DataStoreService from "../DataStoreService";
+import {CallableRequest} from "firebase-functions/lib/common/providers/https";
 
 export const postOperations =
-    async (data: PostOperationInput, context: any) => {
+    async (request: CallableRequest) => {
     const datastore = new Datastore();
+    const data: PostOperationInput = request.data;
     const transaction = datastore.transaction();
     let dateTimeNow = new Date().getTime();
     let operations: Operation[];
@@ -25,7 +27,7 @@ export const postOperations =
     try {
         await transaction.run();
         const dbOperations = await dataStoreService.getFilteredEntities(
-            "operation", "user", getUserEmailByContext(context), "created");
+            "operation", "user", getUserEmailByContext(request), "created");
         const selectedDbOperations = dbOperations.filter((op) => {
             const key = op[datastore.KEY];
             return data.ids.includes(key.id);
@@ -40,14 +42,14 @@ export const postOperations =
                 date: item.date,
                 sum: item.sum,
                 tags: item.tags,
-                user: getUserEmailByContext(context),
+                user: getUserEmailByContext(request),
                 created: new Date(dateTimeNow),
             };
         });
     } catch (error: any) {
         await transaction.rollback();
         const runQueryError: RunQueryError = error;
-        throw new functions.https.HttpsError("internal",
+        throw new HttpsError("internal",
             runQueryError.details);
     }
     const result: PostedOperationRecord[] = [];
@@ -71,7 +73,7 @@ export const postOperations =
     } catch (err: any) {
         await transaction.rollback();
         const runQueryError: RunQueryError = err;
-        throw new functions.https.HttpsError("internal",
+        throw new HttpsError("internal",
             runQueryError.details);
     }
 };

@@ -1,10 +1,12 @@
 import {Datastore} from "@google-cloud/datastore";
 import DataStoreService from "../DataStoreService";
-import * as functions from "firebase-functions";
+import {HttpsError} from "firebase-functions/v2/https";
+import {CallableRequest} from "firebase-functions/lib/common/providers/https";
 
-export const getReportRecords = async (data: any, context: any) => {
+export const getReportRecords = async (request: CallableRequest) => {
     try {
         const datastore = new Datastore();
+        const data: GetReportRecordInput = request.data;
         const dataStoreService = new DataStoreService(datastore);
         const blockedMap = new Map();
         const startDate = data.filter.startDate ?
@@ -42,7 +44,7 @@ export const getReportRecords = async (data: any, context: any) => {
         };
     } catch (error: any) {
         const runQueryError: RunQueryError = error;
-        throw new functions.https.HttpsError("internal",
+        throw new HttpsError("internal",
             runQueryError.details);
     }
 };

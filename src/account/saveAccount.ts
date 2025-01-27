@@ -1,9 +1,11 @@
 import {Datastore} from "@google-cloud/datastore";
-import * as functions from "firebase-functions";
+import {HttpsError} from "firebase-functions/v2/https";
 import DataStoreService from "../DataStoreService";
+import {CallableRequest} from "firebase-functions/lib/common/providers/https";
 
-export const saveAccount = async (data: SaveAccountInput, context: any) => {
+export const saveAccount = async (request: CallableRequest) => {
     try {
+        const data: SaveAccountInput = request.data;
         const datastore = new Datastore();
         const dataStoreService = new DataStoreService(datastore);
         const currency =
@@ -16,7 +18,7 @@ export const saveAccount = async (data: SaveAccountInput, context: any) => {
         });
     } catch (error: any) {
         const runQueryError: RunQueryError = error;
-        throw new functions.https.HttpsError("internal",
+        throw new HttpsError("internal",
             runQueryError.details);
     }
 };

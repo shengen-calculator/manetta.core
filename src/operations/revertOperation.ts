@@ -1,12 +1,14 @@
 import {Datastore} from "@google-cloud/datastore";
-import * as functions from "firebase-functions";
+import {HttpsError} from "firebase-functions/v2/https";
 import DataStoreService from "../DataStoreService";
 import OperationService from "../OperationService";
 import {getUserEmailByContext} from "../auth/authHelper";
+import {CallableRequest} from "firebase-functions/lib/common/providers/https";
 
 export const revertOperation =
-    async (data: RevertOperationInput, context: any) => {
+    async (request: CallableRequest) => {
         const datastore = new Datastore();
+        const data: RevertOperationInput = request.data;
         const transaction = datastore.transaction();
         const dateTimeNow = new Date().getTime();
         let dbOperations= [];
@@ -22,14 +24,14 @@ export const revertOperation =
         } catch (error: any) {
             await transaction.rollback();
             const runQueryError: RunQueryError = error;
-            throw new functions.https.HttpsError("internal",
+            throw new HttpsError("internal",
                 runQueryError.details);
         }
 
         // validation
         for (const operation of dbOperations) {
             if (operation.isReverted || operation.isRevertOperation) {
-                throw new functions.https.HttpsError("invalid-argument",
+                throw new HttpsError("invalid-argument",
                     `Looks like document already contains reverted or 
                     revert operation.`);
             }
@@ -51,7 +53,7 @@ export const revertOperation =
                     date: operation.date,
                     sum: opposite(operation.sum),
                     tags: operation.tags,
-                    user: getUserEmailByContext(context),
+                    user: getUserEmailByContext(request),
                     created: new Date(dateTimeNow),
                 }, operation.docNumber, true);
                 result.unshift(record);
@@ -68,7 +70,7 @@ export const revertOperation =
         } catch (error: any) {
             await transaction.rollback();
             const runQueryError: RunQueryError = error;
-            throw new functions.https.HttpsError("internal",
+            throw new HttpsError("internal",
                 runQueryError.details);
         }
     };

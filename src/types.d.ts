@@ -101,10 +101,6 @@ type DeleteGroupInput = {
     name: string
 }
 
-type GetCurrencyRateInput = {
-    currency: string
-}
-
 type GetCurrencyRateResult = {
     rate: number,
     date: Date
@@ -137,5 +133,21 @@ type ReportRow = {
     date: Date | null,
     sum: number,
     description: string,
+    tags: string[]
+}
+
+type GetPostedOperationInput = {
+    startDate: number,
+    endDate: number
+}
+
+type GetReportRecordInput = {
+    filter: ReportFilter,
+    startCursor: string
+}
+
+type ReportFilter = {
+    startDate: number,
+    endDate: number,
     tags: string[]
 }

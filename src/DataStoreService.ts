@@ -1,5 +1,5 @@
 import {Datastore} from "@google-cloud/datastore";
-import * as functions from "firebase-functions";
+import {HttpsError} from "firebase-functions/v2/https";
 import {RunQueryResponse} from "@google-cloud/datastore/build/src/query";
 import {Transaction} from "@google-cloud/datastore/build/src";
 
@@ -9,6 +9,8 @@ import {Transaction} from "@google-cloud/datastore/build/src";
 export default class DataStoreService {
     private readonly datastore: Datastore;
     private readonly transaction: Transaction | undefined;
+    private readonly QUERY_LIMIT = 200;
+    private readonly MAX_REQUEST_NUMBER = 10;
 
     /**
      * Main class constructor
@@ -102,8 +104,10 @@ export default class DataStoreService {
         let items: any[] = [];
         let endCursor: string | undefined;
         let moreResults: string | undefined = undefined;
+        let requestNumber = 0;
         try {
-            while (moreResults !== Datastore.NO_MORE_RESULTS) {
+            while (moreResults !== Datastore.NO_MORE_RESULTS &&
+            requestNumber < this.MAX_REQUEST_NUMBER) {
                 const storeQuery = this.datastore.createQuery(entity);
                 if (onlyKey) {
                     storeQuery.select("__key__");
@@ -117,7 +121,7 @@ export default class DataStoreService {
                 for (const tag of tags) {
                     storeQuery.filter("tags", "=", tag);
                 }
-                storeQuery.limit(200);
+                storeQuery.limit(this.QUERY_LIMIT);
                 if (endCursor) {
                     storeQuery.start(endCursor);
                 }
@@ -127,11 +131,12 @@ export default class DataStoreService {
                 const [entities, info] = queryResult;
                 ({endCursor, moreResults} = info);
                 items = [...items, ...entities];
+                requestNumber++;
             }
             return items;
         } catch (error: any) {
             const runQueryError: RunQueryError = error;
-            throw new functions.https.HttpsError("internal",
+            throw new HttpsError("internal",
                 runQueryError.details);
         }
     }

@@ -1,9 +1,10 @@
 import {Datastore} from "@google-cloud/datastore";
-import * as functions from "firebase-functions";
+import {HttpsError} from "firebase-functions/v2/https";
 import OperationService from "../OperationService";
+import {CallableRequest} from "firebase-functions/lib/common/providers/https";
 
-export const getAccountBalance = async (data: GetAccountBalanceInput,
-                                        context: any) => {
+export const getAccountBalance = async (request: CallableRequest) => {
+    const data: GetAccountBalanceInput = request.data;
     const datastore = new Datastore();
     const transaction = datastore.transaction({readOnly: true});
     const operationService = new OperationService(datastore, transaction);
@@ -18,7 +19,7 @@ export const getAccountBalance = async (data: GetAccountBalanceInput,
     } catch (err: any) {
         await transaction.rollback();
         const runQueryError: RunQueryError = err;
-        throw new functions.https.HttpsError("internal",
+        throw new HttpsError("internal",
             runQueryError.details);
     }
 };

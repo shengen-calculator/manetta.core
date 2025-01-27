@@ -1,8 +1,9 @@
 import DataStoreService from "../DataStoreService";
-import * as functions from "firebase-functions";
 import {Datastore} from "@google-cloud/datastore";
+import {CallableRequest} from "firebase-functions/lib/common/providers/https";
+import {HttpsError} from "firebase-functions/v2/https";
 
-export const getAllTags = async (data: any, context: any) => {
+export const getAllTags = async (request: CallableRequest) => {
     try {
         const datastore = new Datastore();
         const dataStoreService = new DataStoreService(datastore);
@@ -10,7 +11,7 @@ export const getAllTags = async (data: any, context: any) => {
         return tags.map((data) => data.tags);
     } catch (error: any) {
         const runQueryError: RunQueryError = error;
-        throw new functions.https.HttpsError("internal",
+        throw new HttpsError("internal",
             runQueryError.details);
     }
 };

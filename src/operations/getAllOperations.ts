@@ -1,15 +1,16 @@
 import DataStoreService from "../DataStoreService";
-import * as functions from "firebase-functions";
+import {HttpsError} from "firebase-functions/v2/https";
 import {Datastore} from "@google-cloud/datastore";
 import {getUserEmailByContext} from "../auth/authHelper";
+import {CallableRequest} from "firebase-functions/lib/common/providers/https";
 
-export const getAllOperation = async (data: any, context: any) => {
+export const getAllOperation = async (request: CallableRequest) => {
     try {
         const datastore = new Datastore();
         const dataStoreService = new DataStoreService(datastore);
         const operations =
             await dataStoreService.getFilteredEntities("operation",
-            "user", getUserEmailByContext(context));
+            "user", getUserEmailByContext(request));
         return operations.map((entity) => {
             const key = entity[datastore.KEY];
             return {
@@ -25,7 +26,7 @@ export const getAllOperation = async (data: any, context: any) => {
         });
     } catch (error: any) {
         const runQueryError: RunQueryError = error;
-        throw new functions.https.HttpsError("internal",
+        throw new HttpsError("internal",
             runQueryError.details);
     }
 };

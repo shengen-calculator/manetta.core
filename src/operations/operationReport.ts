@@ -1,12 +1,14 @@
 import DataStoreService from "../DataStoreService";
-import * as functions from "firebase-functions";
+import {HttpsError} from "firebase-functions/v2/https";
 import {Datastore} from "@google-cloud/datastore";
 import ExcelReport from "../ExcelReport";
 import * as fs from "fs";
+import {CallableRequest} from "firebase-functions/lib/common/providers/https";
 
-export const operationReport = async (data: any, context: any) => {
+export const operationReport = async (request: CallableRequest) => {
     try {
         const datastore = new Datastore();
+        const data: ReportFilter = request.data;
         const dataStoreService = new DataStoreService(datastore);
         const startDate = data.startDate ? new Date(data.startDate) : undefined;
         const endDate = data.endDate ? new Date(data.endDate) : undefined;
@@ -33,7 +35,7 @@ export const operationReport = async (data: any, context: any) => {
         return url;
     } catch (error: any) {
         const runQueryError: RunQueryError = error;
-        throw new functions.https.HttpsError("internal",
+        throw new HttpsError("internal",
             runQueryError.details);
     }
 };
