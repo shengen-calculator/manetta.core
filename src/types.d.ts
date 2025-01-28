@@ -151,3 +151,24 @@ type ReportFilter = {
     endDate: number,
     tags: string[]
 }
+
+type RequestBody = {
+    event: EventType,
+    message: InputMessage
+}
+
+type EventType = "subscribed" | "unsubscribed" | "conversation_started" |
+    "delivered" | "seen" | "message";
+
+type InputMessage = {
+    chat: Chat
+}
+
+type OutputMessage = {
+    chat_id: string,
+    text: string
+}
+
+type Chat = {
+    id: string
+}
