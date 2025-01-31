@@ -5,7 +5,7 @@ import BotRequestHandler from "../BotRequestHandler";
 /**
  * Request phone number
  */
-export default class WelcomeMessage extends BotRequestHandler {
+export default class UserRegistration extends BotRequestHandler {
     /**
      *
      * @param {string} body
@@ -20,7 +20,7 @@ export default class WelcomeMessage extends BotRequestHandler {
      * @return {boolean}
      */
     condition(): boolean {
-        return this.body.message.text === "/start";
+        return !!this.body.message.contact;
     }
 
     /**
@@ -28,18 +28,20 @@ export default class WelcomeMessage extends BotRequestHandler {
      */
     async handle(): Promise<AxiosResponse> {
         const chatId = this.body.message.chat.id;
+        // eslint-disable-next-line max-len
+        let text = `Dear ${this.body.message.contact?.first_name} your identity has been successfully established`;
+        let removeKeyboard = false;
+        if (this.body.message.from.id !== this.body.message.contact?.user_id) {
+            text = "Please provide your contact information";
+        } else {
+            removeKeyboard = true;
+            // todo: save userId
+        }
         const welcomeMessage: OutputMessage = {
             chat_id: chatId,
-            text: "Welcome to Manetta!",
+            text: text,
             reply_markup: {
-                keyboard: [
-                    [
-                        {
-                            text: "Send contact information",
-                            request_contact: true,
-                        },
-                    ],
-                ],
+                remove_keyboard: removeKeyboard,
             },
         };
         const helper = new MessageHelper(welcomeMessage);

@@ -1,5 +1,8 @@
 import BotRequestHandler from "./BotRequestHandler";
 import WelcomeMessage from "./bot/WelcomeMessage";
+import UserRegistration from "./bot/UserRegistration";
+import SaveOperation from "./bot/SaveOperation";
+import PostOperations from "./bot/PostOperations";
 
 /**
  * Bot Runner
@@ -17,6 +20,9 @@ export default class TelegramRunner {
     constructor(body: string) {
         this.handlers = [
             new WelcomeMessage(body),
+            new UserRegistration(body),
+            new SaveOperation(body),
+            new PostOperations(body),
         ];
     }
 

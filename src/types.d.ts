@@ -161,11 +161,41 @@ type EventType = "subscribed" | "unsubscribed" | "conversation_started" |
     "delivered" | "seen" | "message";
 
 type InputMessage = {
-    chat: Chat
+    chat: Chat,
+    text: string,
+    from: ChatBotUser,
+    contact?: ChatBotContact
+}
+
+type ChatBotContact = {
+    phone_number: string
+    first_name: string,
+    last_name: string,
+    user_id: string
+}
+
+type ChatBotUser = {
+    id: string,
+    first_name: string,
+    last_name: string,
 }
 
 type OutputMessage = {
     chat_id: string,
+    text: string,
+    reply_markup?: ReplyKeyboardMarkup | RemoveKeyboard
+}
+
+type RemoveKeyboard = {
+    remove_keyboard: boolean
+}
+
+type ReplyKeyboardMarkup = {
+    keyboard: KeyboardButton[][]
+}
+
+type KeyboardButton = {
+    request_contact: boolean
     text: string
 }
 

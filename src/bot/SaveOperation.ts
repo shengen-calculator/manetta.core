@@ -5,7 +5,7 @@ import BotRequestHandler from "../BotRequestHandler";
 /**
  * Request phone number
  */
-export default class WelcomeMessage extends BotRequestHandler {
+export default class SaveOperation extends BotRequestHandler {
     /**
      *
      * @param {string} body
@@ -20,7 +20,7 @@ export default class WelcomeMessage extends BotRequestHandler {
      * @return {boolean}
      */
     condition(): boolean {
-        return this.body.message.text === "/start";
+        return false;
     }
 
     /**
@@ -29,18 +29,8 @@ export default class WelcomeMessage extends BotRequestHandler {
     async handle(): Promise<AxiosResponse> {
         const chatId = this.body.message.chat.id;
         const welcomeMessage: OutputMessage = {
-            chat_id: chatId,
-            text: "Welcome to Manetta!",
-            reply_markup: {
-                keyboard: [
-                    [
-                        {
-                            text: "Send contact information",
-                            request_contact: true,
-                        },
-                    ],
-                ],
-            },
+            "chat_id": chatId,
+            "text": "Hello world!!!",
         };
         const helper = new MessageHelper(welcomeMessage);
         return await helper.send();
