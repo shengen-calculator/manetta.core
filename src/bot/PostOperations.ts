@@ -20,7 +20,7 @@ export default class PostOperations extends BotRequestHandler {
      * @return {boolean}
      */
     condition(): boolean {
-        return false;
+        return this.body.message.text === "/post";
     }
 
     /**
