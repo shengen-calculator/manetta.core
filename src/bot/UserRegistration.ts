@@ -1,6 +1,8 @@
 import {AxiosResponse} from "axios";
 import MessageHelper from "../MessageHelper";
 import BotRequestHandler from "../BotRequestHandler";
+import {Datastore} from "@google-cloud/datastore";
+import DataStoreService from "../DataStoreService";
 
 /**
  * Request phone number
@@ -28,23 +30,41 @@ export default class UserRegistration extends BotRequestHandler {
      */
     async handle(): Promise<AxiosResponse> {
         const chatId = this.body.message.chat.id;
-        // eslint-disable-next-line max-len
-        let text = `Dear ${this.body.message.contact?.first_name} your identity has been successfully established`;
-        let removeKeyboard = false;
-        if (this.body.message.from.id !== this.body.message.contact?.user_id) {
-            text = "Please provide your contact information";
-        } else {
-            removeKeyboard = true;
-            // todo: save userId
+        const isOwnContact =
+            this.body.message.from.id === this.body.message.contact?.user_id;
+        if (!isOwnContact) {
+            const message = {
+                chat_id: chatId,
+                text: "Please provide your own contact information",
+            };
+            const helper = new MessageHelper(message);
+            return await helper.send();
         }
-        const welcomeMessage: OutputMessage = {
+        const datastore = new Datastore();
+        const dataStoreService = new DataStoreService(datastore);
+        const phone = this.body.message.contact?.phone_number;
+        const userEntity = phone ? await dataStoreService
+            .getSingleEntity("user", "phone", phone) : null;
+        if (userEntity) {
+            const key = userEntity[datastore.KEY];
+            await dataStoreService.updateEntity("user", Number(key["id"]), {
+                telegramId: this.body.message.contact?.user_id,
+            });
+        }
+
+        const message = userEntity ? {
             chat_id: chatId,
-            text: text,
+            // eslint-disable-next-line max-len
+            text: `Dear ${this.body.message.contact?.first_name} your identity has been successfully established`,
             reply_markup: {
-                remove_keyboard: removeKeyboard,
+                remove_keyboard: true,
             },
+        } : {
+            chat_id: chatId,
+            text: "Please contact administrator",
         };
-        const helper = new MessageHelper(welcomeMessage);
+
+        const helper = new MessageHelper(message);
         return await helper.send();
     }
 }

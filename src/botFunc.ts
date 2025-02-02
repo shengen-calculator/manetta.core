@@ -11,8 +11,6 @@ export const telegramBot = onRequest(
         const token = request.get(Constants.HEADER_TOKEN_KEY);
         const telegramToken = defineSecret(Constants.TELEGRAM_TOKEN);
         if (token !== telegramToken.value()) {
-            logger.info(`Token -> ${token}`);
-            logger.info(`Telegram token -> ${telegramToken.value()}`);
             response.status(500).send("Wrong token");
             return;
         }
