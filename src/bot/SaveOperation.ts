@@ -1,7 +1,6 @@
 import {AxiosResponse} from "axios";
 import MessageHelper from "../MessageHelper";
 import BotRequestHandler from "../BotRequestHandler";
-import * as logger from "firebase-functions/logger";
 import {Datastore} from "@google-cloud/datastore";
 import DataStoreService from "../DataStoreService";
 
@@ -65,13 +64,14 @@ export default class SaveOperation extends BotRequestHandler {
      * parse Account info
      * @private
      */
-    private async parseAccount(): Promise<string | null> {
+    private async parseAccount(): Promise<any | null> {
         const accountEntities =
             await this.dataStoreService.getAll("account", false);
         const accounts = accountEntities.map((entity) => {
             const key = entity[this.datastore.KEY];
             return {
                 name: key.name,
+                key,
             };
         });
         for (let i = 0; i < this.args.length; i++) {
@@ -80,7 +80,7 @@ export default class SaveOperation extends BotRequestHandler {
                 for (let j = 0; j < accounts.length; j++) {
                     if (SaveOperation.isEqual(accountAbbr, accounts[j].name)) {
                         this.args.splice(i, 1);
-                        return accounts[j].name;
+                        return accounts[j].key;
                     }
                 }
             }
@@ -143,6 +143,17 @@ export default class SaveOperation extends BotRequestHandler {
      */
     async handle(): Promise<AxiosResponse> {
         const chatId = this.body.message.chat.id;
+        const userId = this.body.message.from.id;
+        const userEntity = await this.dataStoreService
+            .getSingleEntity("user", "telegramId", userId);
+
+        if (!userEntity) {
+            const helper = new MessageHelper({
+                "chat_id": chatId,
+                "text": "Please contact System Administrator",
+            });
+            return await helper.send();
+        }
 
         const account = await this.parseAccount();
         if (!account) {
@@ -163,17 +174,18 @@ export default class SaveOperation extends BotRequestHandler {
         }
 
         const description = this.args.length ? this.args.pop() : "";
-        const payload = {
-            sum: this.sum,
-            group: group?.name,
-            tags: group?.tags,
-            accounts: account,
-            description: description,
-        };
+        // save operation
+        await this.dataStoreService.insertEntityNewKey("operation", {
+            account,
+            sum: this.sum * 100,
+            date: new Date(),
+            group: group.name,
+            description,
+            created: new Date().getTime(),
+            tags: group.tags,
+            user: userEntity["email"],
+        });
 
-        logger.info(`payload => ${JSON.stringify(payload)}`);
-
-        // todo: save operation
         const welcomeMessage: OutputMessage = {
             "chat_id": chatId,
             "text": "Saved",
