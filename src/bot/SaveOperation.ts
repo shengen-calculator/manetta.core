@@ -75,7 +75,7 @@ export default class SaveOperation extends BotRequestHandler {
             };
         });
         for (let i = 0; i < this.args.length; i++) {
-            const accountAbbr = this.args[i];
+            const accountAbbr = this.args[i].trim();
             if (accountAbbr.length <= this.ACCOUNT_MAX_LENGTH) {
                 for (let j = 0; j < accounts.length; j++) {
                     if (SaveOperation.isEqual(accountAbbr, accounts[j].name)) {
@@ -104,7 +104,7 @@ export default class SaveOperation extends BotRequestHandler {
             };
         });
         for (let i = 0; i < this.args.length; i++) {
-            const groupAbbr = this.args[i];
+            const groupAbbr = this.args[i].trim();
             if (groupAbbr.length <= this.GROUP_MAX_LENGTH) {
                 for (let j = 0; j < groups.length; j++) {
                     if (SaveOperation.isEqual(groupAbbr, groups[j].name)) {
