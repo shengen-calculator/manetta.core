@@ -1,4 +1,4 @@
-import {Datastore} from "@google-cloud/datastore";
+import {Datastore, InsertResponse} from "@google-cloud/datastore";
 import {HttpsError} from "firebase-functions/v2/https";
 import {RunQueryResponse} from "@google-cloud/datastore/build/src/query";
 import {Transaction} from "@google-cloud/datastore/build/src";
@@ -371,7 +371,9 @@ export default class DataStoreService {
      * @param {number} key
      * @param {object} data
      */
-    public async insertEntity(entity: Entity, key: number, data: any) {
+    public async insertEntity(entity: Entity,
+                              key: number,
+                              data: any): Promise<InsertResponse | void> {
         const entityKey = this.datastore.key([entity, key]);
         return this.transaction ?
             await this.transaction.insert({

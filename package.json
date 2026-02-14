@@ -14,6 +14,7 @@
     "deploy:group": "firebase deploy --only functions:group",
     "deploy:currency": "firebase deploy --only functions:currency",
     "deploy:account": "firebase deploy --only functions:account",
+    "deploy:bot": "firebase deploy --only functions:bot",
     "logs": "firebase functions:log"
   },
   "engines": {
@@ -22,6 +23,8 @@
   "main": "lib/index.js",
   "dependencies": {
     "@google-cloud/datastore": "^7.0.0",
+    "@google-cloud/storage": "^7.15.1",
+    "axios": "^1.7.5",
     "excel4node": "^1.8.2",
     "firebase-admin": "^12.1.0",
     "firebase-functions": "^5.0.0"
@@ -33,7 +36,7 @@
     "eslint-config-google": "^0.14.0",
     "eslint-plugin-import": "^2.25.4",
     "firebase-functions-test": "^0.2.0",
-    "typescript": "^4.5.4"
+    "typescript": "^5.7.3"
   },
   "private": true
 }

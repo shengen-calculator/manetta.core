@@ -7,3 +7,5 @@ exports.tag = require("./tagFunc");
 exports.group = require("./groupFunc");
 exports.currency = require("./currencyFunc");
 exports.account = require("./accountFunc");
+exports.bot = require("./botFunc");
+
