@@ -1,7 +1,6 @@
-import {Datastore, InsertResponse} from "@google-cloud/datastore";
+import {Datastore, InsertResponse, Transaction} from "@google-cloud/datastore";
 import {HttpsError} from "firebase-functions/v2/https";
 import {RunQueryResponse} from "@google-cloud/datastore/build/src/query";
-import {Transaction} from "@google-cloud/datastore/build/src";
 
 /**
  * Represents a main dataStore service
