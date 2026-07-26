@@ -1,204 +1,211 @@
 type Claims = {
-    role: string
-}
+    role: string;
+};
 
 interface OperationBase {
-    id: string | undefined,
-    date: string | Date,
-    account: string | DbItem,
-    description: string,
-    sum: number,
-    tags: string[]
+    id: string | undefined;
+    date: string | Date;
+    account: string | DbItem;
+    description: string;
+    sum: number;
+    tags: string[];
 }
 
-interface SaveOperationInput extends OperationBase{
-    date: string,
-    group: string,
-    account: string,
+interface SaveOperationInput extends OperationBase {
+    date: string;
+    group: string;
+    account: string;
 }
 
-interface Operation extends OperationBase{
-    id: string,
-    date: Date,
-    account: DbItem,
-    user: string,
-    created: Date,
+interface UpdateOperationInput {
+    ids: number[];
+    tags: string[];
+    description?: string;
+    date?: string;
+}
+
+interface Operation extends OperationBase {
+    id: string;
+    date: Date;
+    account: DbItem;
+    user: string;
+    created: Date;
 }
 
 type DeleteOperationInput = {
-    id: number
-}
+    id: number;
+};
 
 type PostOperationInput = {
-    postAsSingle: boolean,
-    ids: Array<string>
-}
+    postAsSingle: boolean;
+    ids: Array<string>;
+};
 
 type RevertOperationInput = {
-    docNumber: number
+    docNumber: number;
+};
+
+interface PostedOperation extends OperationBase {
+    account: DbItem;
+    currency: DbItem;
+    date: Date;
+    balance: number;
+    docNumber: number;
+    equivalent: number;
+    rate: number;
+    created: Date;
+    isReverted?: boolean;
+    isRevertOperation?: boolean;
 }
 
-interface PostedOperation extends OperationBase{
-    account: DbItem,
-    currency: DbItem,
-    date: Date,
-    balance: number,
-    docNumber: number,
-    equivalent: number,
-    rate: number,
-    created: Date,
-    isReverted?: boolean,
-    isRevertOperation?: boolean
+interface PostedOperationRecord extends
+    Omit<PostedOperation, "id" | "account" | "currency"> {
+    user: string;
+    account: Key;
+    currency: Key;
+    blocked?: number;
 }
 
-interface PostedOperationRecord extends Omit<PostedOperation,
-    "id" | "account" | "currency"> {
-    user: string,
-    account: Key,
-    currency: Key,
-    blocked?: number
-}
-
-interface ReportOperation extends OperationBase{
-    isReverted?: boolean,
-    isRevertOperation?: boolean
+interface ReportOperation extends OperationBase {
+    isReverted?: boolean;
+    isRevertOperation?: boolean;
 }
 
 type Key = {
-    namespace?: string
-    id?: string
-    name?: string
-    kind: string
-}
+    namespace?: string;
+    id?: string;
+    name?: string;
+    kind: string;
+};
 
-type Entity = "group" | "tag" | "account" | "rate" |
-    "user" | "currency" | "posted" | "operation";
+type Entity = "group" | "tag" | "account" | "rate" | "user" |
+    "currency" | "posted" | "operation" | "posted-log";
 
 type ROLE = "ADMIN" | "BOOKER";
 
 type DbItem = {
-    id: string,
-    name: string,
-    kind: string,
-}
+    id: string;
+    name: string;
+    kind: string;
+};
 
 type User = {
-    email: string,
-    role: ROLE
-}
+    email: string;
+    role: ROLE;
+};
 
 type RunQueryError = {
-    code: number,
-    details: string
-}
+    code: number;
+    details: string;
+};
 
 type SaveGroupInput = {
-    name: string,
-    tags: string[]
-}
+    name: string;
+    tags: string[];
+};
 
 type DeleteGroupInput = {
-    name: string
-}
+    name: string;
+};
 
 type GetCurrencyRateResult = {
-    rate: number,
-    date: Date
-}
+    rate: number;
+    date: Date;
+};
 
 type AddCurrencyRateInput = {
-    currency: string,
-    rate: number,
-    date: string,
-}
+    currency: string;
+    rate: number;
+    date: string;
+};
 
 type SaveAccountInput = {
-    accountName: string,
-    currency: string,
-    blocked: number,
-    isActive: boolean
-}
+    accountName: string;
+    currency: string;
+    blocked: number;
+    isActive: boolean;
+};
 
 type GetAccountBalanceInput = {
-    accountName: string
-}
+    accountName: string;
+};
 
 type Account = {
-    currency: DbItem,
-    isActive: boolean,
-    blocked: number,
-}
+    currency: DbItem;
+    isActive: boolean;
+    blocked: number;
+};
 
 type ReportRow = {
-    date: Date | null,
-    sum: number,
-    description: string,
-    tags: string[]
-}
+    date: Date | null;
+    sum: number;
+    description: string;
+    tags: string[];
+};
 
 type GetPostedOperationInput = {
-    startDate: number,
-    endDate: number
-}
+    startDate: number;
+    endDate: number;
+};
 
 type GetReportRecordInput = {
-    filter: ReportFilter,
-    startCursor: string
-}
+    filter: ReportFilter;
+    startCursor: string;
+};
 
 type ReportFilter = {
-    startDate: number,
-    endDate: number,
-    tags: string[]
-}
+    startDate: number;
+    endDate: number;
+    tags: string[];
+};
 
 type RequestBody = {
-    event: EventType,
-    message: InputMessage
-}
+    event: EventType;
+    message: InputMessage;
+};
 
-type EventType = "subscribed" | "unsubscribed" | "conversation_started" |
-    "delivered" | "seen" | "message";
+type EventType = "subscribed" | "unsubscribed" |
+    "conversation_started" | "delivered" | "seen" | "message";
 
 type InputMessage = {
-    chat: Chat,
-    text: string,
-    from: ChatBotUser,
-    contact?: ChatBotContact
-}
+    chat: Chat;
+    text: string;
+    from: ChatBotUser;
+    contact?: ChatBotContact;
+};
 
 type ChatBotContact = {
-    phone_number: string
-    first_name: string,
-    last_name: string,
-    user_id: string
-}
+    phone_number: string;
+    first_name: string;
+    last_name: string;
+    user_id: string;
+};
 
 type ChatBotUser = {
-    id: string,
-    first_name: string,
-    last_name: string,
-}
+    id: string;
+    first_name: string;
+    last_name: string;
+};
 
 type OutputMessage = {
-    chat_id: string,
-    text: string,
-    reply_markup?: ReplyKeyboardMarkup | RemoveKeyboard
-}
+    chat_id: string;
+    text: string;
+    reply_markup?: ReplyKeyboardMarkup | RemoveKeyboard;
+};
 
 type RemoveKeyboard = {
-    remove_keyboard: boolean
-}
+    remove_keyboard: boolean;
+};
 
 type ReplyKeyboardMarkup = {
-    keyboard: KeyboardButton[][]
-}
+    keyboard: KeyboardButton[][];
+};
 
 type KeyboardButton = {
-    request_contact: boolean
-    text: string
-}
+    request_contact: boolean;
+    text: string;
+};
 
 type Chat = {
-    id: string
-}
+    id: string;
+};

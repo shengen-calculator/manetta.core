@@ -359,9 +359,7 @@ export default class DataStoreService {
      */
     public getDatastoreNestedEntityNewKey(
         entity: Entity, ancestor: Entity, ancestorKey: string) {
-        return this.transaction ?
-            this.transaction.key([ancestor, ancestorKey, entity]) :
-            this.datastore.key([ancestor, ancestorKey, entity]);
+        return this.datastore.key([ancestor, ancestorKey, entity]);
     }
 
     /**
@@ -374,6 +372,24 @@ export default class DataStoreService {
                               key: number,
                               data: any): Promise<InsertResponse | void> {
         const entityKey = this.datastore.key([entity, key]);
+        return this.transaction ?
+            await this.transaction.insert({
+                key: entityKey,
+                data: data,
+            }) :
+            await this.datastore.insert({
+                key: entityKey,
+                data: data,
+            });
+    }
+
+    /**
+     * Insert new Entity, key must be provided
+     * @param {Key} entityKey
+     * @param {object} data
+     */
+    public async insertNestedEntity(
+        entityKey: Key, data: any): Promise<InsertResponse | void> {
         return this.transaction ?
             await this.transaction.insert({
                 key: entityKey,

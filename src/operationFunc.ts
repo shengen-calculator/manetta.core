@@ -8,7 +8,7 @@ import {getRecentlyPosted} from "./operations/getRecentlyPosted";
 import {operationReport} from "./operations/operationReport";
 import {revertOperation} from "./operations/revertOperation";
 import {getReportRecords} from "./operations/getReportRecords";
-import {updateDescription} from "./operations/updateDescription";
+import {updateOperation} from "./operations/updateOperation";
 
 exports.postOperations = authDecorator(postOperations, ["ADMIN", "BOOKER"]);
 exports.revertOperation = authDecorator(revertOperation, ["ADMIN", "BOOKER"]);
@@ -22,4 +22,4 @@ exports.getReportRecords =
     authDecorator(getReportRecords, ["ADMIN", "BOOKER"]);
 exports.getPostedOperation =
     authDecorator(getPostedOperation, ["ADMIN", "BOOKER"]);
-exports.updateDescription = authDecorator(updateDescription, ["ADMIN"]);
+exports.updateOperation = authDecorator(updateOperation, ["ADMIN"]);
