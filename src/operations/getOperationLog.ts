@@ -14,6 +14,7 @@ export const getOperationLog = async (request: CallableRequest) => {
             return {
                 description: entry.description,
                 date: entry.date.getTime(),
+                user: entry.user,
                 operationDate: entry.operationDate?.getTime(),
                 tags: entry.tags,
             };
