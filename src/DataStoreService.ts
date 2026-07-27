@@ -262,6 +262,39 @@ export default class DataStoreService {
     }
 
     /**
+     * Get one latest entity, selected by ancestor
+     * @param {Entity} entity
+     * @param {Entity} ancestor
+     * @param {string} key
+     * @param {string} startCursor
+     */
+    public async getNewestNestedItems(entity: Entity,
+                                     ancestor: Entity,
+                                     key: string,
+                                     startCursor: string) {
+        const ancestorKey = this.datastore.key([ancestor, key]);
+
+        const storeQuery = this.transaction ?
+            this.transaction.createQuery(entity).hasAncestor(ancestorKey) :
+            this.datastore.createQuery(entity).hasAncestor(ancestorKey);
+
+        storeQuery.order("date", {
+            descending: true,
+        });
+        storeQuery.limit(200);
+        storeQuery.start(startCursor);
+        const queryResult: RunQueryResponse = this.transaction ?
+            await this.transaction.runQuery(storeQuery) :
+            await this.datastore.runQuery(storeQuery);
+
+        const [entities, info] = queryResult;
+        return {
+            entities,
+            info,
+        };
+    }
+
+    /**
      * Get one newest entity filtered by value and ordered by any field
      * @param {Entity} entity
      * @param {string} filteredField

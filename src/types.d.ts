@@ -36,6 +36,11 @@ type DeleteOperationInput = {
     id: number;
 };
 
+type GetOperationLogInput = {
+    id: number;
+    startCursor: string;
+};
+
 type PostOperationInput = {
     postAsSingle: boolean;
     ids: Array<string>;
