@@ -60,6 +60,6 @@ export const updateOperation = async (request: CallableRequest) => {
     } catch (error: any) {
         await transaction.rollback();
         const runQueryError: RunQueryError = error;
-        throw new HttpsError("internal", runQueryError.details);
+        throw new HttpsError("internal", runQueryError.details ?? error);
     }
 };

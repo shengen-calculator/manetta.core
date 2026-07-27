@@ -25,6 +25,6 @@ export const getOperationLog = async (request: CallableRequest) => {
         };
     } catch (error: any) {
         const runQueryError: RunQueryError = error;
-        throw new HttpsError("internal", runQueryError.details);
+        throw new HttpsError("internal", runQueryError.details ?? error);
     }
 };
