@@ -9,12 +9,12 @@ export const updateOperation = async (request: CallableRequest) => {
     const data: UpdateOperationInput = request.data;
     const transaction = datastore.transaction();
     const dataStoreService = new DataStoreService(datastore, transaction);
-
+    const entries = [];
     try {
         await transaction.run();
         for (const id of data.ids) {
-            const posted: PostedOperation = await
-                  dataStoreService.getEntityById("posted", id);
+            const posted: PostedOperation =
+                await dataStoreService.getEntityById("posted", id);
             let log = {};
             if (data.description) {
                 log = {
@@ -38,16 +38,25 @@ export const updateOperation = async (request: CallableRequest) => {
             const logKey = dataStoreService.getDatastoreNestedEntityNewKey(
                 "posted-log", "posted", id.toString());
             await dataStoreService.saveEntity("posted", id, posted);
-            await dataStoreService.insertNestedEntity(
-                logKey,
-                {
-                    ...log,
-                    date: new Date(),
-                    user: getUserEmailByContext(request),
-                },
-            );
+            await dataStoreService.insertNestedEntity(logKey, {
+                ...log,
+                date: new Date(),
+                user: getUserEmailByContext(request),
+            });
+            const {currency, rate, ...record} = posted;
+            entries.push({
+                ...record,
+                id,
+                account: record.account.name,
+                date: record.date.getTime(),
+                created: record.created.getTime(),
+                euro: record.equivalent,
+            });
         }
         await transaction.commit();
+        return {
+            entries,
+        };
     } catch (error: any) {
         await transaction.rollback();
         const runQueryError: RunQueryError = error;
