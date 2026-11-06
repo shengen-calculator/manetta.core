@@ -1,7 +1,6 @@
-import {Datastore, InsertResponse} from "@google-cloud/datastore";
+import {Datastore, InsertResponse, Transaction} from "@google-cloud/datastore";
 import {HttpsError} from "firebase-functions/v2/https";
 import {RunQueryResponse} from "@google-cloud/datastore/build/src/query";
-import {Transaction} from "@google-cloud/datastore/build/src";
 
 /**
  * Represents a main dataStore service
@@ -263,6 +262,39 @@ export default class DataStoreService {
     }
 
     /**
+     * Get one latest entity, selected by ancestor
+     * @param {Entity} entity
+     * @param {Entity} ancestor
+     * @param {string} key
+     * @param {string} startCursor
+     */
+    public async getNewestNestedItems(entity: Entity,
+                                     ancestor: Entity,
+                                     key: string,
+                                     startCursor: string) {
+        const ancestorKey = this.datastore.key([ancestor, key]);
+
+        const storeQuery = this.transaction ?
+            this.transaction.createQuery(entity).hasAncestor(ancestorKey) :
+            this.datastore.createQuery(entity).hasAncestor(ancestorKey);
+
+        storeQuery.order("date", {
+            descending: true,
+        });
+        storeQuery.limit(200);
+        storeQuery.start(startCursor);
+        const queryResult: RunQueryResponse = this.transaction ?
+            await this.transaction.runQuery(storeQuery) :
+            await this.datastore.runQuery(storeQuery);
+
+        const [entities, info] = queryResult;
+        return {
+            entities,
+            info,
+        };
+    }
+
+    /**
      * Get one newest entity filtered by value and ordered by any field
      * @param {Entity} entity
      * @param {string} filteredField
@@ -360,9 +392,7 @@ export default class DataStoreService {
      */
     public getDatastoreNestedEntityNewKey(
         entity: Entity, ancestor: Entity, ancestorKey: string) {
-        return this.transaction ?
-            this.transaction.key([ancestor, ancestorKey, entity]) :
-            this.datastore.key([ancestor, ancestorKey, entity]);
+        return this.datastore.key([ancestor, ancestorKey, entity]);
     }
 
     /**
@@ -375,6 +405,24 @@ export default class DataStoreService {
                               key: number,
                               data: any): Promise<InsertResponse | void> {
         const entityKey = this.datastore.key([entity, key]);
+        return this.transaction ?
+            await this.transaction.insert({
+                key: entityKey,
+                data: data,
+            }) :
+            await this.datastore.insert({
+                key: entityKey,
+                data: data,
+            });
+    }
+
+    /**
+     * Insert new Entity, key must be provided
+     * @param {Key} entityKey
+     * @param {object} data
+     */
+    public async insertNestedEntity(
+        entityKey: Key, data: any): Promise<InsertResponse | void> {
         return this.transaction ?
             await this.transaction.insert({
                 key: entityKey,

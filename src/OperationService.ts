@@ -1,5 +1,4 @@
-import {Transaction} from "@google-cloud/datastore/build/src";
-import {Datastore} from "@google-cloud/datastore";
+import {Transaction, Datastore} from "@google-cloud/datastore";
 import DataStoreService from "./DataStoreService";
 import {HttpsError} from "firebase-functions/v2/https";
 import Util from "./Util";
