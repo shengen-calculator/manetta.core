@@ -1,10 +1,12 @@
 import {HttpsError} from "firebase-functions/v2/https";
-import {
-    AuthUserRecord,
-} from "firebase-functions/lib/common/providers/identity";
+import {AuthUserRecord} from "firebase-functions/v2/identity";
 import {getUserByEmail} from "./authHelper";
 
-export const beforeSignIn = async (user: AuthUserRecord) => {
+export const beforeSignIn = async (user: AuthUserRecord | undefined) => {
+    if (!user) {
+        throw new HttpsError("invalid-argument", "Permission denied");
+    }
+
     let dbUser: User;
     try {
         dbUser = await getUserByEmail(user);

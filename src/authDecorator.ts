@@ -1,6 +1,5 @@
-import {CallableRequest} from "firebase-functions/lib/common/providers/https";
+import {CallableRequest, onCall, HttpsError} from "firebase-functions/v2/https";
 import {setGlobalOptions} from "firebase-functions/v2";
-import {onCall, HttpsError} from "firebase-functions/v2/https";
 import * as logger from "firebase-functions/logger";
 
 setGlobalOptions({region: "europe-west1"});

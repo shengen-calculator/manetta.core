@@ -1,9 +1,8 @@
 import DataStoreService from "../DataStoreService";
-import {HttpsError} from "firebase-functions/v2/https";
+import {HttpsError, CallableRequest} from "firebase-functions/v2/https";
 import {Datastore} from "@google-cloud/datastore";
 import ExcelReport from "../ExcelReport";
 import * as fs from "fs";
-import {CallableRequest} from "firebase-functions/lib/common/providers/https";
 
 export const operationReport = async (request: CallableRequest) => {
     try {

@@ -1,7 +1,7 @@
 import DataStoreService from "../DataStoreService";
 import {Datastore} from "@google-cloud/datastore";
-import {AuthUserRecord} from "firebase-functions/lib/common/providers/identity";
-import {CallableRequest} from "firebase-functions/lib/common/providers/https";
+import {AuthUserRecord} from "firebase-functions/v2/identity";
+import {CallableRequest} from "firebase-functions/v2/https";
 
 export const getUserByEmail = async (user: AuthUserRecord): Promise<User> => {
     const datastore = new Datastore();

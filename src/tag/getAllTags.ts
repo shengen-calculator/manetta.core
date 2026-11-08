@@ -1,7 +1,6 @@
 import DataStoreService from "../DataStoreService";
 import {Datastore} from "@google-cloud/datastore";
-import {CallableRequest} from "firebase-functions/lib/common/providers/https";
-import {HttpsError} from "firebase-functions/v2/https";
+import {CallableRequest, HttpsError} from "firebase-functions/v2/https";
 
 export const getAllTags = async (request: CallableRequest) => {
     try {

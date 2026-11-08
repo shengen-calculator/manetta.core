@@ -1,7 +1,6 @@
 import DataStoreService from "../DataStoreService";
-import {HttpsError} from "firebase-functions/v2/https";
+import {HttpsError, CallableRequest} from "firebase-functions/v2/https";
 import {Datastore} from "@google-cloud/datastore";
-import {CallableRequest} from "firebase-functions/lib/common/providers/https";
 
 export const deleteOperation =
     async (request: CallableRequest) => {

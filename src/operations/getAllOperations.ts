@@ -1,8 +1,7 @@
 import DataStoreService from "../DataStoreService";
-import {HttpsError} from "firebase-functions/v2/https";
+import {HttpsError, CallableRequest} from "firebase-functions/v2/https";
 import {Datastore} from "@google-cloud/datastore";
 import {getUserEmailByContext} from "../auth/authHelper";
-import {CallableRequest} from "firebase-functions/lib/common/providers/https";
 
 export const getAllOperation = async (request: CallableRequest) => {
     try {
