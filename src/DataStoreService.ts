@@ -16,8 +16,10 @@ export default class DataStoreService {
      * @param {Datastore} datastore used for no transactional operation
      * @param {Transaction} transaction used for transactional operation
      */
-    constructor(datastore: Datastore,
-                transaction: Transaction | undefined = undefined) {
+    constructor(
+        datastore: Datastore,
+        transaction: Transaction | undefined = undefined,
+    ) {
         this.datastore = datastore;
         this.transaction = transaction;
     }
@@ -54,8 +56,11 @@ export default class DataStoreService {
      * @param {string} filteredField
      * @param {string} value
      */
-    public async getSingleEntity(entity: Entity,
-                                 filteredField: string, value: string) {
+    public async getSingleEntity(
+        entity: Entity,
+        filteredField: string,
+        value: string,
+    ) {
         const storeQuery = this.datastore
             .createQuery(entity)
             .filter(filteredField, "=", value)
@@ -73,8 +78,10 @@ export default class DataStoreService {
      */
     public async getFilteredEntities(
         entity: Entity,
-        filteredField: string, value: string | number,
-        orderField: string | undefined = undefined) {
+        filteredField: string,
+        value: string | number,
+        orderField: string | undefined = undefined,
+    ) {
         const storeQuery = this.transaction ?
             this.transaction.createQuery(entity) :
             this.datastore.createQuery(entity);
@@ -96,17 +103,22 @@ export default class DataStoreService {
      * @param {Date | undefined} endDate
      * @param {tags} tags applied for Operations
      */
-    public async getAll(entity: Entity, onlyKey: boolean,
-                        startDate: Date | undefined = undefined,
-                        endDate: Date | undefined = undefined,
-                        tags: string[] = []) {
+    public async getAll(
+        entity: Entity,
+        onlyKey: boolean,
+        startDate: Date | undefined = undefined,
+        endDate: Date | undefined = undefined,
+        tags: string[] = [],
+    ) {
         let items: any[] = [];
         let endCursor: string | undefined;
         let moreResults: string | undefined = undefined;
         let requestNumber = 0;
         try {
-            while (moreResults !== Datastore.NO_MORE_RESULTS &&
-            requestNumber < this.MAX_REQUEST_NUMBER) {
+            while (
+                moreResults !== Datastore.NO_MORE_RESULTS &&
+                requestNumber < this.MAX_REQUEST_NUMBER
+            ) {
                 const storeQuery = this.datastore.createQuery(entity);
                 if (onlyKey) {
                     storeQuery.select("__key__");
@@ -135,8 +147,7 @@ export default class DataStoreService {
             return items;
         } catch (error: any) {
             const runQueryError: RunQueryError = error;
-            throw new HttpsError("internal",
-                runQueryError.details);
+            throw new HttpsError("internal", runQueryError.details);
         }
     }
 
@@ -147,11 +158,16 @@ export default class DataStoreService {
      * @param {Date | undefined} startDate
      * @param {Date | undefined} endDate
      * @param {tags} tags applied for Operations
+     * @param {number} limit
      */
-    public async getNewestFilteredItems(entity: Entity, startCursor: string,
-                                        startDate: Date | undefined = undefined,
-                                        endDate: Date | undefined = undefined,
-                                        tags: string[] = []) {
+    public async getNewestFilteredItems(
+        entity: Entity,
+        startCursor: string,
+        startDate: Date | undefined = undefined,
+        endDate: Date | undefined = undefined,
+        tags: string[] = [],
+        limit = 20,
+    ) {
         const storeQuery = this.transaction ?
             this.transaction.createQuery(entity) :
             this.datastore.createQuery(entity);
@@ -169,7 +185,7 @@ export default class DataStoreService {
         storeQuery.order("created", {
             descending: true,
         });
-        storeQuery.limit(20);
+        storeQuery.limit(limit);
         storeQuery.start(startCursor);
         const queryResult: RunQueryResponse = this.transaction ?
             await this.transaction.runQuery(storeQuery) :
@@ -188,8 +204,11 @@ export default class DataStoreService {
      * @param {string} orderField
      * @param {boolean} excludeRevertRecords
      */
-    public async getNewestItem(entity: Entity, orderField: string,
-                               excludeRevertRecords = true) {
+    public async getNewestItem(
+        entity: Entity,
+        orderField: string,
+        excludeRevertRecords = true,
+    ) {
         const storeQuery = this.transaction ?
             this.transaction.createQuery(entity) :
             this.datastore.createQuery(entity);
@@ -214,8 +233,11 @@ export default class DataStoreService {
      * @param {string} orderField
      * @param {string} startCursor
      */
-    public async getNewestItems(entity: Entity,
-                                orderField: string, startCursor: string) {
+    public async getNewestItems(
+        entity: Entity,
+        orderField: string,
+        startCursor: string,
+    ) {
         const storeQuery = this.transaction ?
             this.transaction.createQuery(entity) :
             this.datastore.createQuery(entity);
@@ -241,8 +263,11 @@ export default class DataStoreService {
      * @param {Entity} ancestor
      * @param {string} key
      */
-    public async getNewestNestedItem(entity: Entity,
-                                     ancestor: Entity, key: string) {
+    public async getNewestNestedItem(
+        entity: Entity,
+        ancestor: Entity,
+        key: string,
+    ) {
         const ancestorKey = this.datastore.key([ancestor, key]);
 
         const storeQuery = this.transaction ?
@@ -268,10 +293,12 @@ export default class DataStoreService {
      * @param {string} key
      * @param {string} startCursor
      */
-    public async getNewestNestedItems(entity: Entity,
-                                     ancestor: Entity,
-                                     key: string,
-                                     startCursor: string) {
+    public async getNewestNestedItems(
+        entity: Entity,
+        ancestor: Entity,
+        key: string,
+        startCursor: string,
+    ) {
         const ancestorKey = this.datastore.key([ancestor, key]);
 
         const storeQuery = this.transaction ?
@@ -302,11 +329,13 @@ export default class DataStoreService {
      * @param {string} value
      * @param {string} orderedBy
      */
-    public async getNewestFilteredByEntity(entity: Entity,
-                                           filteredField: string,
-                                           filteredEntity: Entity,
-                                           value: string,
-                                           orderedBy: string) {
+    public async getNewestFilteredByEntity(
+        entity: Entity,
+        filteredField: string,
+        filteredEntity: Entity,
+        value: string,
+        orderedBy: string,
+    ) {
         const filteredEntityKey = this.datastore.key([filteredEntity, value]);
 
         const storeQuery = this.transaction ?
@@ -364,13 +393,13 @@ export default class DataStoreService {
         const entityKey = this.datastore.key([entity, key]);
         return this.transaction ?
             await this.transaction.save({
-                key: entityKey,
-                data: data,
-            }) :
+                  key: entityKey,
+                  data: data,
+              }) :
             await this.datastore.save({
-                key: entityKey,
-                data: data,
-            });
+                  key: entityKey,
+                  data: data,
+              });
     }
 
     /**
@@ -391,7 +420,10 @@ export default class DataStoreService {
      * @return {entity.Key}
      */
     public getDatastoreNestedEntityNewKey(
-        entity: Entity, ancestor: Entity, ancestorKey: string) {
+        entity: Entity,
+        ancestor: Entity,
+        ancestorKey: string,
+    ) {
         return this.datastore.key([ancestor, ancestorKey, entity]);
     }
 
@@ -401,19 +433,21 @@ export default class DataStoreService {
      * @param {number} key
      * @param {object} data
      */
-    public async insertEntity(entity: Entity,
-                              key: number,
-                              data: any): Promise<InsertResponse | void> {
+    public async insertEntity(
+        entity: Entity,
+        key: number,
+        data: any,
+    ): Promise<InsertResponse | void> {
         const entityKey = this.datastore.key([entity, key]);
         return this.transaction ?
             await this.transaction.insert({
-                key: entityKey,
-                data: data,
-            }) :
+                  key: entityKey,
+                  data: data,
+              }) :
             await this.datastore.insert({
-                key: entityKey,
-                data: data,
-            });
+                  key: entityKey,
+                  data: data,
+              });
     }
 
     /**
@@ -422,16 +456,18 @@ export default class DataStoreService {
      * @param {object} data
      */
     public async insertNestedEntity(
-        entityKey: Key, data: any): Promise<InsertResponse | void> {
+        entityKey: Key,
+        data: any,
+    ): Promise<InsertResponse | void> {
         return this.transaction ?
             await this.transaction.insert({
-                key: entityKey,
-                data: data,
-            }) :
+                  key: entityKey,
+                  data: data,
+              }) :
             await this.datastore.insert({
-                key: entityKey,
-                data: data,
-            });
+                  key: entityKey,
+                  data: data,
+              });
     }
 
     /**
@@ -443,13 +479,13 @@ export default class DataStoreService {
         const entityKey = this.datastore.key(entity);
         return this.transaction ?
             await this.transaction.insert({
-                key: entityKey,
-                data: data,
-            }) :
+                  key: entityKey,
+                  data: data,
+              }) :
             await this.datastore.insert({
-                key: entityKey,
-                data: data,
-            });
+                  key: entityKey,
+                  data: data,
+              });
     }
 
     /**

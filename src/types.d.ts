@@ -11,6 +11,10 @@ interface OperationBase {
     tags: string[];
 }
 
+interface CreateFromTemplateInput {
+    tags: string[];
+}
+
 interface SaveOperationInput extends OperationBase {
     date: string;
     group: string;
@@ -63,8 +67,10 @@ interface PostedOperation extends OperationBase {
     isRevertOperation?: boolean;
 }
 
-interface PostedOperationRecord extends
-    Omit<PostedOperation, "id" | "account" | "currency"> {
+interface PostedOperationRecord extends Omit<
+    PostedOperation,
+    "id" | "account" | "currency"
+> {
     user: string;
     account: Key;
     currency: Key;
@@ -83,8 +89,16 @@ type Key = {
     kind: string;
 };
 
-type Entity = "group" | "tag" | "account" | "rate" | "user" |
-    "currency" | "posted" | "operation" | "posted-log";
+type Entity =
+    | "group"
+    | "tag"
+    | "account"
+    | "rate"
+    | "user"
+    | "currency"
+    | "posted"
+    | "operation"
+    | "posted-log";
 
 type ROLE = "ADMIN" | "BOOKER";
 
@@ -169,8 +183,13 @@ type RequestBody = {
     message: InputMessage;
 };
 
-type EventType = "subscribed" | "unsubscribed" |
-    "conversation_started" | "delivered" | "seen" | "message";
+type EventType =
+    | "subscribed"
+    | "unsubscribed"
+    | "conversation_started"
+    | "delivered"
+    | "seen"
+    | "message";
 
 type InputMessage = {
     chat: Chat;

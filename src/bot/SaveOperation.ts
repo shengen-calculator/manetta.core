@@ -65,8 +65,10 @@ export default class SaveOperation extends BotRequestHandler {
      * @private
      */
     private async parseAccount(): Promise<any | null> {
-        const accountEntities =
-            await this.dataStoreService.getAll("account", false);
+        const accountEntities = await this.dataStoreService.getAll(
+            "account",
+            false,
+        );
         const accounts = accountEntities.map((entity) => {
             const key = entity[this.datastore.KEY];
             return {
@@ -92,10 +94,11 @@ export default class SaveOperation extends BotRequestHandler {
      * parse Group info include tags
      * @private
      */
-    private async parseGroup():
-        Promise<{ name: string, tags: string[] } | null> {
-        const groupEntities =
-            await this.dataStoreService.getAll("group", false);
+    private async parseGroup(): Promise<{name: string; tags: string[]} | null> {
+        const groupEntities = await this.dataStoreService.getAll(
+            "group",
+            false,
+        );
         const groups = groupEntities.map((entity) => {
             const key = entity[this.datastore.KEY];
             return {
@@ -144,13 +147,16 @@ export default class SaveOperation extends BotRequestHandler {
     async handle(): Promise<AxiosResponse> {
         const chatId = this.body.message.chat.id;
         const userId = this.body.message.from.id;
-        const userEntity = await this.dataStoreService
-            .getSingleEntity("user", "telegramId", userId);
+        const userEntity = await this.dataStoreService.getSingleEntity(
+            "user",
+            "telegramId",
+            userId,
+        );
 
         if (!userEntity) {
             const helper = new MessageHelper({
-                "chat_id": chatId,
-                "text": "Please contact System Administrator",
+                chat_id: chatId,
+                text: "Please contact System Administrator",
             });
             return await helper.send();
         }
@@ -158,8 +164,8 @@ export default class SaveOperation extends BotRequestHandler {
         const account = await this.parseAccount();
         if (!account) {
             const helper = new MessageHelper({
-                "chat_id": chatId,
-                "text": "Missed Account",
+                chat_id: chatId,
+                text: "Missed Account",
             });
             return await helper.send();
         }
@@ -167,13 +173,31 @@ export default class SaveOperation extends BotRequestHandler {
         const group = await this.parseGroup();
         if (!group) {
             const helper = new MessageHelper({
-                "chat_id": chatId,
-                "text": "Missed Group",
+                chat_id: chatId,
+                text: "Missed Group",
             });
             return await helper.send();
         }
 
         const description = this.args.length ? this.args.pop() : "";
+
+        // remove old operation
+        const dbOperations = await this.dataStoreService.getFilteredEntities(
+            "operation",
+            "user",
+            userEntity["email"],
+            "created",
+        );
+        const dbOperation = dbOperations.find(
+            (operation) => operation.sum === 0,
+        );
+        if (dbOperation) {
+            const key = dbOperation[this.datastore.KEY];
+            await this.dataStoreService.deleteEnityById(
+                "operation",
+                Number(key.id),
+            );
+        }
         // save operation
         await this.dataStoreService.insertEntityNewKey("operation", {
             account,
@@ -187,8 +211,8 @@ export default class SaveOperation extends BotRequestHandler {
         });
 
         const welcomeMessage: OutputMessage = {
-            "chat_id": chatId,
-            "text": "Saved",
+            chat_id: chatId,
+            text: "Saved",
         };
         const helper = new MessageHelper(welcomeMessage);
         return await helper.send();
