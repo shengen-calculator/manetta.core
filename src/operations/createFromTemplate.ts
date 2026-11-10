@@ -57,4 +57,17 @@ export const createFromTemplate = async (request: CallableRequest) => {
             user: getUserEmailByContext(request),
         });
     }
+    return operations.map((entity) => {
+        const key = entity[datastore.KEY];
+        return {
+            id: key.id,
+            account: entity.account.name,
+            date: entity.date.getTime(),
+            group: entity.group,
+            created: entity.created,
+            description: entity.description,
+            sum: entity.sum,
+            tags: entity.tags,
+        };
+    });
 };
