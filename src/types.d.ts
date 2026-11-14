@@ -12,7 +12,7 @@ interface OperationBase {
 }
 
 interface CreateFromTemplateInput {
-    tags: string[];
+    group: string;
 }
 
 interface SaveOperationInput extends OperationBase {

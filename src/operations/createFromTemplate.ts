@@ -6,7 +6,15 @@ import {getUserEmailByContext} from "../auth/authHelper";
 export const createFromTemplate = async (request: CallableRequest) => {
     const datastore = new Datastore();
     const data: CreateFromTemplateInput = request.data;
-    const dataStoreService = new DataStoreService(datastore);
+    const transaction = datastore.transaction();
+    const dataStoreService = new DataStoreService(datastore, transaction);
+
+    await transaction.run();
+
+    const groupEntity = await dataStoreService.getEntityByName(
+        "group",
+        data.group,
+    );
 
     const dbOperations = await dataStoreService.getFilteredEntities(
         "operation",
@@ -30,7 +38,7 @@ export const createFromTemplate = async (request: CallableRequest) => {
         "",
         undefined,
         undefined,
-        data.tags,
+        groupEntity["tags"],
         1,
     );
     if (!newest.entities.length) {
@@ -50,11 +58,19 @@ export const createFromTemplate = async (request: CallableRequest) => {
             account: operation.account,
             sum: operation.sum,
             date: new Date(),
-            group: operation.group,
+            group: data.group,
             description: operation.description,
             created: new Date().getTime(),
             tags: operation.tags,
             user: getUserEmailByContext(request),
         });
+    }
+
+    try {
+        return await transaction.commit();
+    } catch (err: any) {
+        await transaction.rollback();
+        const runQueryError: RunQueryError = err;
+        throw new HttpsError("internal", runQueryError.details);
     }
 };
