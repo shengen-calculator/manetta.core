@@ -164,3 +164,4 @@ SELECT * FROM posted WHERE date > DATETIME('2023-01-01T23:59:59z') AND date < DA
 }
 
 firebase deploy --only functions:operation-getAllOperation
+firebase functions:delete operation-getAllOperation
