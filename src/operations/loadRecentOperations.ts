@@ -3,9 +3,9 @@ import {CallableRequest, HttpsError} from "firebase-functions/v2/https";
 import DataStoreService from "../DataStoreService";
 import {getUserEmailByContext} from "../auth/authHelper";
 
-export const createFromTemplate = async (request: CallableRequest) => {
+export const loadRecentOperations = async (request: CallableRequest) => {
     const datastore = new Datastore();
-    const data: CreateFromTemplateInput = request.data;
+    const data: LoadRecentOperationsInput = request.data;
     const transaction = datastore.transaction();
     const dataStoreService = new DataStoreService(datastore, transaction);
 

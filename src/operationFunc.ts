@@ -10,7 +10,7 @@ import {revertOperation} from "./operations/revertOperation";
 import {getReportRecords} from "./operations/getReportRecords";
 import {updateOperation} from "./operations/updateOperation";
 import {getOperationLog} from "./operations/getOperationLog";
-import {createFromTemplate} from "./operations/createFromTemplate";
+import {loadRecentOperations} from "./operations/loadRecentOperations";
 
 exports.postOperations = authDecorator(postOperations, ["ADMIN", "BOOKER"]);
 exports.revertOperation = authDecorator(revertOperation, ["ADMIN", "BOOKER"]);
@@ -29,4 +29,4 @@ exports.getPostedOperation = authDecorator(getPostedOperation, [
 ]);
 exports.updateOperation = authDecorator(updateOperation, ["ADMIN"]);
 exports.getOperationLog = authDecorator(getOperationLog, ["ADMIN"]);
-exports.createFromTemplate = authDecorator(createFromTemplate, ["ADMIN"]);
+exports.loadRecentOperations = authDecorator(loadRecentOperations, ["ADMIN"]);

@@ -11,7 +11,7 @@ interface OperationBase {
     tags: string[];
 }
 
-interface CreateFromTemplateInput {
+interface LoadRecentOperationsInput {
     group: string;
 }
 
