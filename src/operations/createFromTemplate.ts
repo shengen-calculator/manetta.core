@@ -53,7 +53,7 @@ export const createFromTemplate = async (request: CallableRequest) => {
         "docNumber",
         record.docNumber,
     );
-	let created = new Date().getTime();
+    let created = new Date().getTime();
     for (const operation of operations) {
         await dataStoreService.insertEntityNewKey("operation", {
             account: operation.account,
@@ -65,7 +65,7 @@ export const createFromTemplate = async (request: CallableRequest) => {
             tags: operation.tags,
             user: getUserEmailByContext(request),
         });
-		created += 100;
+        created += 100;
     }
 
     try {
